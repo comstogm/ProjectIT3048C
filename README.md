@@ -20,7 +20,7 @@ Using My Calorie Counter will allow you to track your calories along with receiv
 
 ## Storyboard
 
-![Dashboard4](https://user-images.githubusercontent.com/77344568/215071273-1faba0b1-a6f4-4b5a-9180-1ed7c455a854.png)
+![Storyboard](https://user-images.githubusercontent.com/108550644/215225937-45d24529-db41-418a-a7ca-323b2c3297bf.png)
 
 ## Functional Requirements
 
