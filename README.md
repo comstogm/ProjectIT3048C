@@ -74,7 +74,7 @@ Calories are stated as a decimal
 
 ## Class Diagram
 
-![IT3048C drawio](https://user-images.githubusercontent.com/77344568/215071420-94d46c3a-6820-43a0-abdf-ff9ec7c7325e.png)
+![ClassDiagram_WithBackground](https://user-images.githubusercontent.com/77344568/215330455-7435a751-143e-4dd5-8784-15b68192f908.png)
 
 ## Class Diagram Description
 
@@ -94,5 +94,5 @@ Calories are stated as a decimal
 
 ## Weekling Meeting(s)
 
-Monday at 7:30 PM on Teams.  
-If needed, a second meeting will be held Friday at 7:30 PM on Teams.
+Monday at 6:00 PM on Teams.  
+If needed, a second meeting will be held Friday at 6:00 PM on Teams.
