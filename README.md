@@ -92,7 +92,7 @@ Calories are stated as a decimal
 - Frontend Developer: Anastasiia Efimova  
 - Integration Developer: Daniel West  
 
-## Weekling Meeting(s)
+## Weekly Meeting(s)
 
 Monday at 6:00 PM on Teams.  
 If needed, a second meeting will be held Friday at 6:00 PM on Teams.
