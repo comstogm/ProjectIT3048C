@@ -1,5 +1,5 @@
 package dto
 
-class FoodItems(var description: String, var foodNutrients: FoodNutrients) {
+data class FoodItems(var fdcId: String, var description: String, var foodNutrients: ArrayList<FoodNutrients>) {
 
 }

@@ -2,6 +2,8 @@ package com.projectit3048c.ss23
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import dto.Food
+import dto.FoodItems
+import dto.FoodNutrients
 import junit.framework.TestCase.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -15,10 +17,11 @@ class CalorieCounterTest {
     var rule: TestRule = InstantTaskExecutorRule()
 
     lateinit var foodService : FoodService
-    var allFoods : List<Food>? = ArrayList<Food>()
+    //var allFoods : List<Food>? = ArrayList<Food>()
+    var allFoods : Food? = null
 
     @Test
-    fun `Giving food calorie, data available when I search for egg then I should receive 1 egg - 70cal`() = runTest{
+    fun `Giving food calorie, data available when I search for egg then I should receive 1 egg`() = runTest{
         givingFoodServiceIsInitialized()
         whenFoodDataAreReadAndParsed()
         thenTheFoodCollectionShouldContainEgg()
@@ -36,11 +39,11 @@ class CalorieCounterTest {
 
     private fun thenTheFoodCollectionShouldContainEgg() {
         assertNotNull(allFoods)
-        assertTrue(allFoods!!.isNotEmpty())
+        //assertTrue(allFoods!!.isNotEmpty())
         var containsEgg = false
 
-        allFoods!!.forEach {
-            if (it.genus.equals("Cercis")) {
+        allFoods!!.foods.forEach {
+            if (it.description.contains("Eggs, Grade A, Large, egg white")) {
                 containsEgg = true
             }
         }
