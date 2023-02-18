@@ -9,7 +9,7 @@ import kotlinx.coroutines.withContext
 import retrofit2.awaitResponse
 
 class FoodService {
-    suspend fun fetchFoods(): List<Food>? {
+    suspend fun fetchFoods(): Food? {
         return withContext(Dispatchers.IO) {
             val service = RetrofitClientInstance.retrofitInstance?.create(iFoodDAO::class.java)
             val foods = async {service?.getAllFoods()}
