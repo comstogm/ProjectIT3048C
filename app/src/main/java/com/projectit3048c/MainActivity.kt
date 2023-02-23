@@ -1,6 +1,5 @@
-package com.projectit3048c.ss23
+package com.projectit3048c
 
-import MainViewModel
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -13,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.projectit3048c.ss23.R
 import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

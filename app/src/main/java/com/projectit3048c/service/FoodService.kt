@@ -1,8 +1,8 @@
-package service
+package com.projectit3048c.service
 
-import RetrofitClientInstance
-import dao.iFoodDAO
-import dto.Food
+import com.projectit3048c.RetrofitClientInstance
+import com.projectit3048c.dao.iFoodDAO
+import com.projectit3048c.dto.Food
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext

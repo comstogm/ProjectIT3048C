@@ -1,15 +1,13 @@
 package com.projectit3048c.ss23
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import dto.Food
-import dto.FoodItems
-import dto.FoodNutrients
+import com.projectit3048c.dto.Food
 import junit.framework.TestCase.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.Rule
 import org.junit.rules.TestRule
-import service.FoodService
+import com.projectit3048c.service.FoodService
 
 class CalorieCounterTest {
 

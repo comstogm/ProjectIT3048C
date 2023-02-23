@@ -1,3 +1,5 @@
+package com.projectit3048c
+
 import android.app.Application
 import org.koin.android.BuildConfig
 import org.koin.android.ext.koin.androidContext

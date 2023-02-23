@@ -1,6 +1,6 @@
-package dao
+package com.projectit3048c.dao
 
-import dto.Food
+import com.projectit3048c.dto.Food
 import retrofit2.Call
 import retrofit2.http.GET
 
