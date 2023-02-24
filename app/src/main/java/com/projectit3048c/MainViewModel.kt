@@ -6,8 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.projectit3048c.dto.Food
 import kotlinx.coroutines.launch
 import com.projectit3048c.service.FoodService
+import com.projectit3048c.service.IFoodService
 
-class MainViewModel(var foodService : FoodService =  FoodService()) : ViewModel() {
+class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel() {
 
     var foods : MutableLiveData<Food?> = MutableLiveData<Food?>()
 
