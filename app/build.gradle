@@ -60,6 +60,7 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
+    implementation "androidx.compose.runtime:runtime-livedata:$compose_ui_version"
     testImplementation 'androidx.arch.core:core-testing:2.1.0'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0'
     implementation 'com.squareup.retrofit2:retrofit:2.7.1'
