@@ -11,6 +11,7 @@ import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -97,8 +98,8 @@ fun CalorieFacts(name:String) {
                     onClick = {delete(foodItems)}
                         ){
                     Icon(
-                        imageVector = Icons.Filled.Check,
-                        contentDescription = "Edit"
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = "Delete"
                     )
 
                 }
