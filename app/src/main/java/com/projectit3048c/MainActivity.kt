@@ -34,11 +34,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            //
             //viewModel.fetchFoods()
-            //
-            //val foods by viewModel.foods.observeAsState(initial = emptyList())
-            //
+            //val foods by viewModel.foods.observeAsState(initial = Food())
             ProjectIT3048CTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -50,77 +47,93 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
-
-@Composable
-fun CalorieFacts(name:String) {
-    var foodItem by remember { mutableStateOf("") }
-    var itemCalorie by remember { mutableStateOf("") }
-    var itemServing by remember { mutableStateOf("") }
-    val context = LocalContext.current
-    Column {
-        OutlinedTextField(
-            value = foodItem,
-            onValueChange = { foodItem = it },
-            label = { Text(stringResource(R.string.foodItem)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = itemCalorie,
-            onValueChange = { itemCalorie = it },
-            label = { Text(stringResource(R.string.itemCalorie)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = itemServing,
-            onValueChange = { itemServing = it },
-            label = { Text(stringResource(R.string.itemServing)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Button(
-            onClick = {
-                Toast.makeText(context, "$foodItem $itemCalorie $itemServing", Toast.LENGTH_LONG)
-                    .show()
-            }
-        ) {
-            Text(text = "Add")
-        }
-    }
-
-
-
-    fun delete(foodItems: FoodItems) {
-      //  ViewModel.deleteSavedFoodDatabase(foodItems)
-    }
-
     @Composable
-    fun EventListItem(foodItems: FoodItems){
-        Row {
-            Column(Modifier.weight(6f)) {
-                Text(text = foodItems.fdcId, style=typography.h6)
-                Text(text = foodItems.description, style=typography.caption)
-            }
-            Column(Modifier.weight(1f)) {
-                Button (
-                    onClick = {delete(foodItems)}
-                        ){
-                    Icon(
-                        imageVector = Icons.Filled.Delete,
-                        contentDescription = "Delete"
-                    )
+    fun CalorieFacts(name:String) {
+        var foodSearch by remember { mutableStateOf("") }
+        var foodItem by remember { mutableStateOf("") }
+        var itemCalorie by remember { mutableStateOf("") }
+        var itemServing by remember { mutableStateOf("") }
+        lateinit var food: Unit
+        val context = LocalContext.current
+        Column {
+            OutlinedTextField(
+                value = foodSearch,
+                onValueChange = { foodSearch = it },
+                label = { Text(stringResource(R.string.foodSearch)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Button(
+                onClick = {
+                    food = viewModel.getSearchResult(foodSearch)
+                }
 
+            ) {
+                Text(text = "Search")
+            }
+            OutlinedTextField(
+                value = foodItem,
+                onValueChange = { foodItem = it },
+                label = { Text(stringResource(R.string.foodItem)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = itemCalorie,
+                onValueChange = { itemCalorie = it },
+                label = { Text(stringResource(R.string.itemCalorie)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = itemServing,
+                onValueChange = { itemServing = it },
+                label = { Text(stringResource(R.string.itemServing)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Button(
+                onClick = {
+                    Toast.makeText(context, "$foodItem $itemCalorie $itemServing", Toast.LENGTH_LONG)
+                        .show()
+                }
+            ) {
+                Text(text = "Add")
+            }
+        }
+
+
+
+        fun delete(foodItems: FoodItems) {
+            //  ViewModel.deleteSavedFoodDatabase(foodItems)
+        }
+
+        @Composable
+        fun EventListItem(foodItems: FoodItems){
+            Row {
+                Column(Modifier.weight(6f)) {
+                    Text(text = foodItems.fdcId, style=typography.h6)
+                    Text(text = foodItems.description, style=typography.caption)
+                }
+                Column(Modifier.weight(1f)) {
+                    Button (
+                        onClick = {delete(foodItems)}
+                    ){
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = "Delete"
+                        )
+
+                    }
                 }
             }
         }
     }
-}
-@Preview(name="Light Mode", showBackground = true)
-@Composable
-fun DefaultPreview() {
-    ProjectIT3048CTheme {
-        Surface(color = MaterialTheme.colors.background,
-        modifier = Modifier.fillMaxWidth()) {
-            CalorieFacts("Android")
+    @Preview(name="Light Mode", showBackground = true)
+    @Composable
+    fun DefaultPreview() {
+        ProjectIT3048CTheme {
+            Surface(color = MaterialTheme.colors.background,
+                modifier = Modifier.fillMaxWidth()) {
+                CalorieFacts("Android")
+            }
         }
     }
 }
+

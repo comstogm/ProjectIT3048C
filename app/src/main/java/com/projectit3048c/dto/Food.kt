@@ -1,3 +1,3 @@
 package com.projectit3048c.dto
 
-data class Food(var foods: ArrayList<FoodItems>)
+data class Food(var foods: ArrayList<FoodItems> = arrayListOf())

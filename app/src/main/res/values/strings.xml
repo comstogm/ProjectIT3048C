@@ -3,4 +3,5 @@
     <string name="foodItem">Food Item</string>
     <string name="itemCalorie">Item Calorie</string>
     <string name="itemServing">Item Serving</string>
+    <string name="foodSearch">Search for Food</string>
 </resources>
