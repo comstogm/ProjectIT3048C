@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -20,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import com.projectit3048c.dto.Food
 import com.projectit3048c.dto.FoodItems
+import com.projectit3048c.MainViewModel
 import com.projectit3048c.ss23.R
 import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
 import okhttp3.internal.cache2.Relay.Companion.edit
@@ -32,6 +34,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            //
+            //viewModel.fetchFoods()
+            //
+            //val foods by viewModel.foods.observeAsState(initial = emptyList())
+            //
             ProjectIT3048CTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
