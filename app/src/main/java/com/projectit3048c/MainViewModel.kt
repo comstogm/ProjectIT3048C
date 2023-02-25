@@ -11,7 +11,7 @@ import com.projectit3048c.service.IFoodService
 
 class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel() {
 
-    var foods : MutableLiveData<Food?> = MutableLiveData<Food?>()
+    var foods: MutableLiveData<Food?> = MutableLiveData<Food?>()
 
 
     fun fetchFoods() {
@@ -23,5 +23,12 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     }
     internal fun deleteSavedFoodDatabase(foodItems: FoodItems){
         // TODO:  
+    }
+
+    fun getSearchResult(query: String) {
+        viewModelScope.launch {
+            var innerFoods = foodService.getSearchResult(query)
+            foods.postValue(innerFoods)
+        }
     }
 }
