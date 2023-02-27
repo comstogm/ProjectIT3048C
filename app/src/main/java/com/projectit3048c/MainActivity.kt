@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
             )
             Button(
                 onClick = {
-                    food = viewModel.getSearchResult(foodSearch)
+                   // food = viewModel.getSearchResult(foodSearch)
                 }
 
             ) {

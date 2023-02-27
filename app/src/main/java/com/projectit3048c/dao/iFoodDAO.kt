@@ -7,11 +7,11 @@ import retrofit2.http.Query
 
 interface iFoodDAO {
 
-    @GET("fdc/v1/foods/search?query=egg&dataType=Foundation&pageSize=3&pageNumber=1&sortBy=dataType.keyword&sortOrder=asc&api_key=trqHcOXD3WWuC2z5OhYoMiUpZaFp2GFtEcUSs8fA")
-    fun getAllFoods() : Call<Food>
+    @GET("/anastasiiaef/JSON/food")
+    fun getAllFoods() : Call<ArrayList<Food>>
 
-    @GET("fdc/v1/foods/search?&dataType=Foundation&pageSize=3&pageNumber=1&sortBy=dataType.keyword&sortOrder=asc&api_key=trqHcOXD3WWuC2z5OhYoMiUpZaFp2GFtEcUSs8fA&")
-    fun getSearchFoods(
-        @Query("query") query: String
-    ) : Call<Food>
+   // @GET("fdc/v1/foods/search?&dataType=Foundation&pageSize=3&pageNumber=1&sortBy=dataType.keyword&sortOrder=asc&api_key=trqHcOXD3WWuC2z5OhYoMiUpZaFp2GFtEcUSs8fA&")
+    //fun getSearchFoods(
+       // @Query("query") query: String
+    //) : Call<Food>
 }
