@@ -24,13 +24,15 @@ import java.util.concurrent.TimeUnit
 
 class CalorieCounterTest {
 
+    lateinit var mvm: MainViewModel
+
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
-    private lateinit var foodService: FoodService
-    private var allFoods: List<Food>? = ArrayList<Food>()
+    lateinit var foodService: FoodService
+    var allFoods: List<Food>? = ArrayList<Food>()
 
-    lateinit var mvm: MainViewModel
+    //lateinit var mvm: MainViewModel
 
     @MockK
     lateinit var mockFoodService: FoodService
@@ -55,8 +57,6 @@ class CalorieCounterTest {
             givingFoodServiceIsInitialized()
             whenFoodDataAreReadAndParsed()
             thenTheFoodCollectionShouldContainEgg()
-            //assert(true)
-            //assertEquals( 2,  1+1)
         }
 
     private fun givingFoodServiceIsInitialized() {
@@ -73,7 +73,7 @@ class CalorieCounterTest {
         var containsEgg = false
 
         allFoods!!.forEach {
-            if (it.name.contains("Apple")) {
+            if (it.name.contains("Egg")) {
                 containsEgg = true
             }
         }
@@ -90,7 +90,7 @@ class CalorieCounterTest {
     @Test
     fun `giving a view model with live data when populated with foods then result show Apple`() {
         givenViewModelIsInitializesWithMockData()
-        whenFoodServiceFetchFoddsInvoked()
+        whenFoodServiceFetchFoodsInvoked()
         thenResultShouldContainApple()
     }
 
@@ -103,12 +103,12 @@ class CalorieCounterTest {
 
         coEvery { mockFoodService.fetchFoods() } returns foods
 
+        //mvm = MainViewModel(foodService = mockFoodService)
         mvm = MainViewModel(foodService = mockFoodService)
-        // mvm.foodService = mockFoodService
-
+        //mvm.foodService = mockFoodService
     }
 
-    private fun whenFoodServiceFetchFoddsInvoked() {
+    private fun whenFoodServiceFetchFoodsInvoked() {
         mvm.fetchFoods()
     }
 

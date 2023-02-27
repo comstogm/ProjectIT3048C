@@ -16,8 +16,8 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
 
     fun fetchFoods() {
         viewModelScope.launch {
-            var innerFoods = foodService.fetchFoods()
-            foods.postValue(innerFoods)
+           var innerFoods = foodService.fetchFoods()
+           foods.postValue(innerFoods)
             //foodService.fetchFoods()
         }
 
