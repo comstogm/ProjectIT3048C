@@ -11,13 +11,14 @@ import com.projectit3048c.service.IFoodService
 
 class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel() {
 
-    var foods: MutableLiveData<Food?> = MutableLiveData<Food?>()
+    var foods: MutableLiveData<List<Food>?> = MutableLiveData<List<Food>?>()
 
 
     fun fetchFoods() {
         viewModelScope.launch {
             var innerFoods = foodService.fetchFoods()
             foods.postValue(innerFoods)
+            //foodService.fetchFoods()
         }
 
     }
@@ -25,10 +26,10 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
         // TODO:  
     }
 
-    fun getSearchResult(query: String) {
-        viewModelScope.launch {
-            var innerFoods = foodService.getSearchResult(query)
-            foods.postValue(innerFoods)
-        }
-    }
+    //fun getSearchResult(query: String) {
+      //  viewModelScope.launch {
+          //  var innerFoods = foodService.getSearchResult(query)
+           // foods.postValue(innerFoods)
+        //}
+    //}
 }
