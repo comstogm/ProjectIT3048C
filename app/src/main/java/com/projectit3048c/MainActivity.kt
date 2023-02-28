@@ -49,10 +49,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colors.background
                 ) {
-                    CalorieFacts("Android")
+                    foods?.let { CalorieFacts("Android", it) }
                 }
-                var foo = foods
-                var i = 1+1
+               // var foo = foods
+                //var i = 1+1
             }
         }
     }
@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
 
 
     @Composable
-    fun TextFieldWithDropdownUsage(dataIn: List<Food>, label : String = "", take :Int = 3) {
+    fun TextFieldWithDropdownUsage(dataIn: List<Food>?, label : String = "", take :Int = 3) {
 
         val dropDownOptions = remember { mutableStateOf(listOf<Food>()) }
         val textFieldValue = remember {mutableStateOf(TextFieldValue()) }
@@ -75,9 +75,9 @@ class MainActivity : ComponentActivity() {
             strSelectedData = value.text
             dropDownExpanded.value = true
             textFieldValue.value = value
-            dropDownOptions.value = dataIn.filter {
+            dropDownOptions.value = dataIn?.filter {
                 it.toString().startsWith(value.text) && it.toString() != value.text
-            }.take(take)
+            }!!.take(take)
         }
 
         TextFieldWithDropdown(
@@ -145,7 +145,7 @@ class MainActivity : ComponentActivity() {
 
 
     @Composable
-    fun CalorieFacts(name:String) {
+    fun CalorieFacts(name:String, foods: List<Food> = ArrayList<Food>()) {
         var foodSearch by remember { mutableStateOf("") }
         var foodItem by remember { mutableStateOf("") }
         var itemCalorie by remember { mutableStateOf("") }
@@ -153,20 +153,22 @@ class MainActivity : ComponentActivity() {
         lateinit var food: Unit
         val context = LocalContext.current
         Column {
-            OutlinedTextField(
-                value = foodSearch,
-                onValueChange = { foodSearch = it },
-                label = { Text(stringResource(R.string.foodSearch)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Button(
-                onClick = {
-                   // food = viewModel.getSearchResult(foodSearch)
-                }
+            TextFieldWithDropdownUsage(dataIn = foods, stringResource(R.string.foodSearch))
 
-            ) {
-                Text(text = "Search")
-            }
+           // OutlinedTextField(
+                //value = foodSearch,
+                //onValueChange = { foodSearch = it },
+               // label = { Text(stringResource(R.string.foodSearch)) },
+               // modifier = Modifier.fillMaxWidth()
+            //)
+           // Button(
+               // onClick = {
+                   // food = viewModel.getSearchResult(foodSearch)
+               // }
+
+          //  ) {
+                //Text(text = "Search")
+           // }
             OutlinedTextField(
                 value = foodItem,
                 onValueChange = { foodItem = it },
