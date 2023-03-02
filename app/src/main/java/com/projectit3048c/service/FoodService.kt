@@ -11,7 +11,6 @@ import retrofit2.awaitResponse
 
 interface IFoodService {
     suspend fun fetchFoods() : List<Food>?
-   // suspend fun getSearchResult(query: String): Food?
 }
 class FoodService : IFoodService {
     override suspend fun fetchFoods() : List<Food>? {
@@ -22,14 +21,4 @@ class FoodService : IFoodService {
             return@withContext result
         }
     }
-
-   // override suspend fun getSearchResult(query: String) : Food? {
-        //return withContext(Dispatchers.IO) {
-            //val service = RetrofitClientInstance.retrofitInstance?.create(iFoodDAO::class.java)
-           // val foods = async {service?.getSearchFoods(query)}
-            //var result = foods.await()?.awaitResponse()?.body()
-           // return@withContext result
-        //}
-   // }
-
 }
