@@ -184,12 +184,7 @@ class MainActivity : ComponentActivity() {
             )
             Button(
                 onClick = {
-                    var foodSpecimen = FoodSpecimen().apply {
-                        this.name = foodItem
-                        calories = itemCalorie.toInt() //need to validate user input
-                    }
-                    Toast.makeText(context, "$foodItem $itemCalorie $itemServing", Toast.LENGTH_LONG)
-                        .show()
+
                 }
             ) {
                 Text(text = "Add")
