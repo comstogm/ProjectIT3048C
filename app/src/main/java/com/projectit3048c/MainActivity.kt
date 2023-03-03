@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -23,16 +22,14 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.PopupProperties
-import androidx.lifecycle.ViewModel
 import com.projectit3048c.dto.Food
 import com.projectit3048c.dto.FoodItems
 import com.projectit3048c.MainViewModel
 import com.projectit3048c.dto.FoodAmount
+import com.projectit3048c.dto.FoodSpecimen
 import com.projectit3048c.ss23.R
 import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
-import okhttp3.internal.cache2.Relay.Companion.edit
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.nio.file.Files.delete
 
 class MainActivity : ComponentActivity() {
     private var selectedFood: Food? = null
@@ -49,12 +46,11 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    foods?.let { CalorieFacts("Android", it) }
+                    color = MaterialTheme.colors.background) {
+                    CalorieFacts("Android")
                 }
-               // var foo = foods
-                //var i = 1+1
+                var foo = foods
+                var i = 1 + 1
             }
         }
     }
