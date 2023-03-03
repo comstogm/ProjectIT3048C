@@ -189,8 +189,8 @@ class MainActivity : ComponentActivity() {
             )
             Button(
                 onClick = {
-                    Toast.makeText(context, "$foodItem $itemCalorie $itemServing", Toast.LENGTH_LONG)
-                        .show()
+                    //Toast.makeText(context, "$foodId $foodName $foodAmount $dateLoged", Toast.LENGTH_LONG)
+                        //.show()
                 }
             ) {
                 Text(text = "Add")
