@@ -18,7 +18,6 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
            var innerFoods = foodService.fetchFoods()
            foods.postValue(innerFoods!!)
         }
-
     }
     internal fun deleteSavedFoodDatabase(foodItems: FoodItems){
         // TODO:  
