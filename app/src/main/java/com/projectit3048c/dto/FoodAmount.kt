@@ -1,7 +1,7 @@
 package com.projectit3048c.dto
 
-data class FoodAmount(val foodId : Int = 0, var foodName : String = "", val foodAmount : Int = 0, var dateLoged : String = "") {
+data class FoodAmount(var foodId : Int = 0, var foodName : String = "", var foodIntake : String = "", var foodAmount : String = "", var foodLoged : String = "") {
     override fun toString(): String {
-        return "$foodName $foodAmount $dateLoged"
+        return "$foodId $foodName $foodAmount $foodLoged"
     }
 }

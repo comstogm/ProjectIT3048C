@@ -27,6 +27,7 @@ import androidx.lifecycle.ViewModel
 import com.projectit3048c.dto.Food
 import com.projectit3048c.dto.FoodItems
 import com.projectit3048c.MainViewModel
+import com.projectit3048c.dto.FoodAmount
 import com.projectit3048c.ss23.R
 import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
 import okhttp3.internal.cache2.Relay.Companion.edit
@@ -34,8 +35,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.nio.file.Files.delete
 
 class MainActivity : ComponentActivity() {
+    private var selectedFood: Food? = null
     private val viewModel : MainViewModel by viewModel<MainViewModel>()
-    private var strSelectedData: String = ""
+    private var inFoodName: String = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,7 +74,7 @@ class MainActivity : ComponentActivity() {
         }
 
         fun onValueChanged(value: TextFieldValue) {
-            strSelectedData = value.text
+            inFoodName = value.text
             dropDownExpanded.value = true
             textFieldValue.value = value
             dropDownOptions.value = dataIn?.filter {
@@ -132,6 +134,7 @@ class MainActivity : ComponentActivity() {
                                 TextRange(text.toString().length)
                             )
                         )
+                        selectedFood = text
                     }) {
                         Text(text = text.toString())
                     }
@@ -140,57 +143,50 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
-
-
-
     @Composable
     fun CalorieFacts(name:String, foods: List<Food> = ArrayList<Food>()) {
-        var foodSearch by remember { mutableStateOf("") }
-        var foodItem by remember { mutableStateOf("") }
-        var itemCalorie by remember { mutableStateOf("") }
-        var itemServing by remember { mutableStateOf("") }
+        var inIntake by remember { mutableStateOf("") }
+        var inLoged by remember { mutableStateOf("") }
+        var inAmount by remember { mutableStateOf("") }
         lateinit var food: Unit
         val context = LocalContext.current
         Column {
-            TextFieldWithDropdownUsage(dataIn = foods, stringResource(R.string.foodSearch))
-
-           // OutlinedTextField(
-                //value = foodSearch,
-                //onValueChange = { foodSearch = it },
-               // label = { Text(stringResource(R.string.foodSearch)) },
-               // modifier = Modifier.fillMaxWidth()
-            //)
-           // Button(
-               // onClick = {
-                   // food = viewModel.getSearchResult(foodSearch)
-               // }
-
-          //  ) {
-                //Text(text = "Search")
-           // }
+            TextFieldWithDropdownUsage(dataIn = foods, stringResource(R.string.foodName))
             OutlinedTextField(
-                value = foodItem,
-                onValueChange = { foodItem = it },
-                label = { Text(stringResource(R.string.foodItem)) },
+                value = inIntake,
+                onValueChange = { inIntake = it },
+                label = { Text(stringResource(R.string.foodIntake)) },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
-                value = itemCalorie,
-                onValueChange = { itemCalorie = it },
-                label = { Text(stringResource(R.string.itemCalorie)) },
+                value = inLoged,
+                onValueChange = { inLoged = it },
+                label = { Text(stringResource(R.string.foodLoged)) },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
-                value = itemServing,
-                onValueChange = { itemServing = it },
-                label = { Text(stringResource(R.string.itemServing)) },
+                value = inAmount,
+                onValueChange = { inAmount = it },
+                label = { Text(stringResource(R.string.foodAmount)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Button(
                 onClick = {
-                    //Toast.makeText(context, "$foodId $foodName $foodAmount $dateLoged", Toast.LENGTH_LONG)
-                        //.show()
+                    var specimen = FoodAmount().apply {
+                        foodName = inFoodName
+                        foodId = selectedFood?.let(){
+                            it.id
+                        } ?: 0
+                        foodAmount = inAmount
+                        foodIntake = inIntake
+                        foodLoged = inLoged
+
+                    }
+                    Toast.makeText(
+                        context,
+                        "$inFoodName $inAmount $inIntake $inLoged",
+                        Toast.LENGTH_LONG)
+                        .show()
                 }
             ) {
                 Text(text = "Add")
