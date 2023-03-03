@@ -47,16 +47,13 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colors.background) {
-                    CalorieFacts("Android")
+                    CalorieFacts("Android", foods)
                 }
                 var foo = foods
                 var i = 1 + 1
             }
         }
     }
-
-
-
 
     @Composable
     fun TextFieldWithDropdownUsage(dataIn: List<Food>?, label : String = "", take :Int = 3) {
@@ -176,7 +173,6 @@ class MainActivity : ComponentActivity() {
                         foodAmount = inAmount
                         foodIntake = inIntake
                         foodLoged = inLoged
-
                     }
                     Toast.makeText(
                         context,
@@ -188,8 +184,6 @@ class MainActivity : ComponentActivity() {
                 Text(text = "Add")
             }
         }
-
-
 
         fun delete(foodItems: FoodItems) {
             //  ViewModel.deleteSavedFoodDatabase(foodItems)
@@ -210,7 +204,6 @@ class MainActivity : ComponentActivity() {
                             imageVector = Icons.Filled.Delete,
                             contentDescription = "Delete"
                         )
-
                     }
                 }
             }
