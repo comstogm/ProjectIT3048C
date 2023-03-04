@@ -4,16 +4,16 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
@@ -21,17 +21,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import com.projectit3048c.dto.Food
 import com.projectit3048c.dto.FoodItems
-import com.projectit3048c.MainViewModel
 import com.projectit3048c.dto.FoodAmount
-import com.projectit3048c.dto.FoodSpecimen
 import com.projectit3048c.ss23.R
 import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
+    private var selectedFoodAmount: FoodAmount? = null
     private var selectedFood: Food? = null
     private val viewModel : MainViewModel by viewModel<MainViewModel>()
     private var inFoodName: String = ""
@@ -137,13 +138,13 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun CalorieFacts(name:String, foods: List<Food> = ArrayList<Food>()) {
+    fun CalorieFacts(name:String, foods: List<Food> = ArrayList<Food>(), loggedFoods: List<FoodAmount> = ArrayList<FoodAmount>()) {
         var inIntake by remember { mutableStateOf("") }
-        var inLoged by remember { mutableStateOf("") }
+        var inLogged by remember { mutableStateOf("") }
         var inAmount by remember { mutableStateOf("") }
-        lateinit var food: Unit
         val context = LocalContext.current
         Column {
+            FoodAmountSpinner(loggedFoods = loggedFoods)
             TextFieldWithDropdownUsage(dataIn = foods, stringResource(R.string.foodName))
             OutlinedTextField(
                 value = inIntake,
@@ -152,8 +153,8 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
-                value = inLoged,
-                onValueChange = { inLoged = it },
+                value = inLogged,
+                onValueChange = { inLogged = it },
                 label = { Text(stringResource(R.string.foodLoged)) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -172,11 +173,11 @@ class MainActivity : ComponentActivity() {
                         } ?: 0
                         foodAmount = inAmount
                         foodIntake = inIntake
-                        foodLoged = inLoged
+                        foodLogged = inLogged
                     }
                     Toast.makeText(
                         context,
-                        "$inFoodName $inAmount $inIntake $inLoged",
+                        "$inFoodName $inAmount $inIntake $inLogged",
                         Toast.LENGTH_LONG)
                         .show()
                 }
@@ -216,6 +217,37 @@ class MainActivity : ComponentActivity() {
             Surface(color = MaterialTheme.colors.background,
                 modifier = Modifier.fillMaxWidth()) {
                 CalorieFacts("Android")
+            }
+        }
+    }
+
+    @Composable
+    fun FoodAmountSpinner (loggedFoods: List<FoodAmount>) {
+        var loggedFoodText by remember { mutableStateOf("Logged Food Collection") }
+        var expanded by remember { mutableStateOf(false) }
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Row(Modifier
+                .padding(24.dp)
+                .clickable {
+                    expanded = !expanded
+                }
+                .padding(8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = loggedFoodText, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
+                Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "")
+                DropdownMenu(expanded = expanded, onDismissRequest = {expanded = false}) {
+                    loggedFoods.forEach {
+                        loggedFood -> DropdownMenuItem(onClick = {
+                            expanded = false
+                        loggedFoodText = loggedFood.toString()
+                        selectedFoodAmount = loggedFood
+                    }) {
+                            Text(text = loggedFood.toString())
+                    }
+                    }
+                }
             }
         }
     }
