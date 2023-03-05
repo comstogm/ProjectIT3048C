@@ -165,50 +165,46 @@ class MainActivity : ComponentActivity() {
             )
             Button(
                 onClick = {
-                    var specimen = FoodAmount().apply {
+                    var foodAmount = FoodAmount().apply {
                         foodName = inFoodName
-                        foodId = selectedFood?.let(){
-                            it.id
-                        } ?: 0
+                        foodId = selectedFood?.id ?: 0
                         foodAmount = inAmount
                         foodIntake = inIntake
                         foodLoged = inLoged
                     }
-                    Toast.makeText(
-                        context,
-                        "$inFoodName $inAmount $inIntake $inLoged",
-                        Toast.LENGTH_LONG)
-                        .show()
+                    Toast.makeText(context, foodAmount.toString(), Toast.LENGTH_LONG).show()
                 }
             ) {
                 Text(text = "Add")
             }
         }
+    }
 
-        fun delete(foodItems: FoodItems) {
-            //  ViewModel.deleteSavedFoodDatabase(foodItems)
-        }
+    fun delete(foodItems: FoodItems) {
+        //  ViewModel.deleteSavedFoodDatabase(foodItems)
+    }
 
-        @Composable
-        fun EventListItem(foodItems: FoodItems){
-            Row {
-                Column(Modifier.weight(6f)) {
-                    Text(text = foodItems.fdcId, style=typography.h6)
-                    Text(text = foodItems.description, style=typography.caption)
-                }
-                Column(Modifier.weight(1f)) {
-                    Button (
-                        onClick = {delete(foodItems)}
-                    ){
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = "Delete"
-                        )
-                    }
+    @Composable
+    fun EventListItem(foodItems: FoodItems){
+        Row {
+            Column(Modifier.weight(6f)) {
+                Text(text = foodItems.fdcId, style=typography.h6)
+                Text(text = foodItems.description, style=typography.caption)
+            }
+            Column(Modifier.weight(1f)) {
+                Button (
+                    onClick = {delete(foodItems)}
+                ){
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = "Delete"
+                    )
                 }
             }
         }
     }
+
+
     @Preview(name="Light Mode", showBackground = true)
     @Composable
     fun DefaultPreview() {

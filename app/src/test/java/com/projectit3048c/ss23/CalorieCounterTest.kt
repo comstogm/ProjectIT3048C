@@ -95,11 +95,11 @@ class CalorieCounterTest {
     }
 
     private fun givenViewModelIsInitializesWithMockData() {
-        val foods = ArrayList<Food>()
-        foods.add(Food(1, "Apple", "1 apple(182g)", 52))
-        val egg = Food(3, "Egg", "1 egg", 155)
-        foods.add(egg)
-        foods.add(Food(2, "Milk", "100g 1% fat",42))
+        val foods = listOf(
+            Food(1, "Apple", "1 apple(182g)", 52),
+            Food(3, "Egg", "1 egg", 155),
+            Food(2, "Milk", "100g 1% fat",42)
+        )
 
         coEvery { mockFoodService.fetchFoods() } returns foods
 
