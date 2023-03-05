@@ -5,7 +5,7 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface iFoodDAO {
+interface IFoodDAO {
 
     @GET("/anastasiiaef/JSON/food")
     fun getAllFoods() : Call<ArrayList<Food>>
