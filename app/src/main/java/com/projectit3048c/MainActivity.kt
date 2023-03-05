@@ -43,12 +43,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             viewModel.fetchFoods()
             val foods by viewModel.foods.observeAsState(initial = emptyList())
+            val foodAmounts by viewModel.foodAmounts.observeAsState(initial = emptyList())
             ProjectIT3048CTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colors.background) {
-                    CalorieFacts("Android", foods)
+                    CalorieFacts("Android", foods, foodAmounts)
                 }
                 var foo = foods
                 var i = 1 + 1

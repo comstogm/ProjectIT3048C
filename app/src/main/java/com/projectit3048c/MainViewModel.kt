@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.projectit3048c.dto.Food
 import com.projectit3048c.dto.FoodAmount
 import com.projectit3048c.dto.FoodItems
+import com.projectit3048c.dto.FoodSpecimen
 import kotlinx.coroutines.launch
 import com.projectit3048c.service.FoodService
 import com.projectit3048c.service.IFoodService
@@ -23,7 +24,32 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     init {
         firestore = FirebaseFirestore.getInstance()
         firestore.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
+        listenToFoodSpecimens()
     }
+
+    private fun listenToFoodSpecimens() {
+        firestore.collection("specimens").addSnapshotListener {
+                snapshot, e ->
+            //handle error
+            if(e != null) {
+                Log.w("Listen failed", e)
+                return@addSnapshotListener
+            }
+            //If we made it here, there is no error
+            snapshot?.let {
+                val allFoodSpecimens = ArrayList<FoodAmount>()
+                val documents = snapshot.documents
+                documents.forEach {
+                    val foodSpecimen = it.toObject(FoodAmount::class.java)
+                    foodSpecimen?.let {
+                        allFoodSpecimens.add(it)
+                    }
+                }
+                foodAmounts.value = allFoodSpecimens
+            }
+        }
+    }
+
     fun fetchFoods() {
         viewModelScope.launch {
            var innerFoods = foodService.fetchFoods()
