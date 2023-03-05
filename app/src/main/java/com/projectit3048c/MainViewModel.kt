@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import com.projectit3048c.service.FoodService
 import com.projectit3048c.service.IFoodService
 
-class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel() {
+class MainViewModel(var foodService: IFoodService =  FoodService()): ViewModel() {
 
     var foods: MutableLiveData<List<Food>> = MutableLiveData<List<Food>>()
 

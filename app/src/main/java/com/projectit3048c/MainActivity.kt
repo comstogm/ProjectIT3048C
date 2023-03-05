@@ -33,7 +33,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
     private var selectedFood: Food? = null
-    private val viewModel : MainViewModel by viewModel<MainViewModel>()
+    private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var inFoodName: String = ""
 
 
@@ -137,7 +137,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun CalorieFacts(name:String, foods: List<Food> = ArrayList<Food>()) {
+    fun CalorieFacts(name:String, foods: List<Food> = ArrayList <Food>()) {
         var inIntake by remember { mutableStateOf("") }
         var inLoged by remember { mutableStateOf("") }
         var inAmount by remember { mutableStateOf("") }
@@ -167,12 +167,10 @@ class MainActivity : ComponentActivity() {
                 onClick = {
                     var specimen = FoodAmount().apply {
                         foodName = inFoodName
-                        foodId = selectedFood?.let(){
-                            it.id
-                        } ?: 0
+                        foodId = selectedFood?.id ?: 0
                         foodAmount = inAmount
                         foodIntake = inIntake
-                        foodLoged = inLoged
+                        foodLogged = inLoged
                     }
                     Toast.makeText(
                         context,
