@@ -165,20 +165,14 @@ class MainActivity : ComponentActivity() {
             )
             Button(
                 onClick = {
-                    var specimen = FoodAmount().apply {
+                    var foodAmount = FoodAmount().apply {
                         foodName = inFoodName
-                        foodId = selectedFood?.let(){
-                            it.id
-                        } ?: 0
+                        foodId = selectedFood?.id ?: 0
                         foodAmount = inAmount
                         foodIntake = inIntake
                         foodLoged = inLoged
                     }
-                    Toast.makeText(
-                        context,
-                        "$inFoodName $inAmount $inIntake $inLoged",
-                        Toast.LENGTH_LONG)
-                        .show()
+                    Toast.makeText(context, foodAmount.toString(), Toast.LENGTH_LONG).show()
                 }
             ) {
                 Text(text = "Add")
