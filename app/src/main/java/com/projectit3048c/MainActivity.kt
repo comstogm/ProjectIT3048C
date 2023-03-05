@@ -32,7 +32,7 @@ import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
-    private var selectedFoodAmount: FoodAmount? = null
+    private var selectedFoodAmount by mutableStateOf(FoodAmount())
     private var selectedFood: Food? = null
     private val viewModel : MainViewModel by viewModel<MainViewModel>()
     private var inFoodName: String = ""
@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colors.background) {
-                    CalorieFacts("Android", foods, foodAmounts)
+                    CalorieFacts("Android", foods, foodAmounts, selectedFoodAmount)
                 }
                 var foo = foods
                 var i = 1 + 1
@@ -58,10 +58,10 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun TextFieldWithDropdownUsage(dataIn: List<Food>?, label : String = "", take :Int = 3) {
+    fun TextFieldWithDropdownUsage(dataIn: List<Food>?, label : String = "", take :Int = 3, selectedFoodAmount: FoodAmount) {
 
         val dropDownOptions = remember { mutableStateOf(listOf<Food>()) }
-        val textFieldValue = remember {mutableStateOf(TextFieldValue()) }
+        val textFieldValue = remember(selectedFoodAmount.foodId) {mutableStateOf(TextFieldValue(selectedFoodAmount.foodName)) }
         val dropDownExpanded = remember { mutableStateOf(false) }
 
         fun onDropdownDismissRequest() {
@@ -139,14 +139,14 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun CalorieFacts(name:String, foods: List<Food> = ArrayList<Food>(), loggedFoods: List<FoodAmount> = ArrayList<FoodAmount>()) {
-        var inIntake by remember { mutableStateOf("") }
-        var inLogged by remember { mutableStateOf("") }
-        var inAmount by remember { mutableStateOf("") }
+    fun CalorieFacts(name:String, foods: List<Food> = ArrayList<Food>(), loggedFoods: List<FoodAmount> = ArrayList<FoodAmount>(), selectedFoodAmount: FoodAmount = FoodAmount()) {
+        var inIntake by remember(selectedFoodAmount.foodIntake) { mutableStateOf(selectedFoodAmount.foodIntake) }
+        var inLogged by remember(selectedFoodAmount.foodLogged) { mutableStateOf(selectedFoodAmount.foodLogged) }
+        var inAmount by remember(selectedFoodAmount.foodAmount) { mutableStateOf(selectedFoodAmount.foodAmount) }
         val context = LocalContext.current
         Column {
             FoodAmountSpinner(loggedFoods = loggedFoods)
-            TextFieldWithDropdownUsage(dataIn = foods, stringResource(R.string.foodName))
+            TextFieldWithDropdownUsage(dataIn = foods, label = stringResource(R.string.foodName), selectedFoodAmount = selectedFoodAmount)
             OutlinedTextField(
                 value = inIntake,
                 onValueChange = { inIntake = it },
