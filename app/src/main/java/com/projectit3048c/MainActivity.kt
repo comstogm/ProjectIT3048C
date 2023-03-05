@@ -175,6 +175,7 @@ class MainActivity : ComponentActivity() {
                         foodIntake = inIntake
                         foodLogged = inLogged
                     }
+                    viewModel.save(specimen)
                     Toast.makeText(
                         context,
                         "$inFoodName $inAmount $inIntake $inLogged",
