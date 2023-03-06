@@ -30,7 +30,7 @@ import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
-    private val viewModel : MainViewModel by viewModel<MainViewModel>()
+    private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var inFoodName: String = ""
 
 
@@ -58,10 +58,9 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun TextFieldWithDropdownUsage(dataIn: List<Food>?, label : String = "", take :Int = 3) {
 
-        val dropDownOptions = remember { mutableStateOf(listOf<Food>()) }
-        val textFieldValue = remember {mutableStateOf(TextFieldValue()) }
-        val dropDownExpanded = remember { mutableStateOf(false) }
-
+        val dropDownOptions = remember { mutableStateOf(listOf<Food>())}
+        val textFieldValue = remember {mutableStateOf(TextFieldValue())}
+        val dropDownExpanded = remember { mutableStateOf(false)}
         fun onDropdownDismissRequest() {
             dropDownExpanded.value = false
         }
