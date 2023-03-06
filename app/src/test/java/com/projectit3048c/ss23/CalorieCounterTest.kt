@@ -87,12 +87,12 @@ class CalorieCounterTest {
     }
 
 
-/*    @Test
+    @Test
     fun `giving a view model with live data when populated with foods then result show Apple`() {
         givenViewModelIsInitializesWithMockData()
         whenFoodServiceFetchFoodsInvoked()
-        thenResultShouldContainApple()//
-    }*/
+        thenResultShouldContainApple()
+    }
 
     private fun givenViewModelIsInitializesWithMockData() {
         val foods = ArrayList<Food>()
