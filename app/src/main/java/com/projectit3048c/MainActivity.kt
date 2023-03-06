@@ -43,10 +43,11 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colors.background) {
-                    CalorieFacts("Android")
-                }
-                var foo = foods
+                    color = MaterialTheme.colors.background
+                ) {
+                        CalorieFacts("Android," , foods)
+                    }
+
                 var i = 1 + 1
             }
         }
