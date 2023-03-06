@@ -91,7 +91,7 @@ class CalorieCounterTest {
     fun `giving a view model with live data when populated with foods then result show Apple`() {
         givenViewModelIsInitializesWithMockData()
         whenFoodServiceFetchFoodsInvoked()
-        thenResultShouldContainApple()
+        thenResultShouldContainApple()//
     }*/
 
     private fun givenViewModelIsInitializesWithMockData() {
