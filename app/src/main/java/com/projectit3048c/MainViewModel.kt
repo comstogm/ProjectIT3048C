@@ -9,7 +9,6 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.projectit3048c.dto.Food
 import com.projectit3048c.dto.FoodAmount
 import com.projectit3048c.dto.FoodItems
-import com.projectit3048c.dto.FoodSpecimen
 import kotlinx.coroutines.launch
 import com.projectit3048c.service.FoodService
 import com.projectit3048c.service.IFoodService

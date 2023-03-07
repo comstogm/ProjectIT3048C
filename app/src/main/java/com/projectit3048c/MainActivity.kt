@@ -141,7 +141,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun CalorieFacts(name:String, foods: List<Food> = ArrayList<Food>(), loggedFoods: List<FoodAmount> = ArrayList<FoodAmount>(), selectedFoodAmount: FoodAmount = FoodAmount()) {
         var inIntake by remember(selectedFoodAmount.foodIntake) { mutableStateOf(selectedFoodAmount.foodIntake) }
-        var inLogged by remember(selectedFoodAmount.foodLogged) { mutableStateOf(selectedFoodAmount.foodLogged) }
+        var inDate by remember(selectedFoodAmount.foodDate) { mutableStateOf(selectedFoodAmount.foodDate) }
         var inAmount by remember(selectedFoodAmount.foodAmount) { mutableStateOf(selectedFoodAmount.foodAmount) }
         val context = LocalContext.current
         Column {
@@ -150,12 +150,12 @@ class MainActivity : ComponentActivity() {
             OutlinedTextField(
                 value = inIntake,
                 onValueChange = { inIntake = it },
-                label = { Text(stringResource(R.string.foodIntake)) },
+                label = { Text(stringResource(R.string.intake)) },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
-                value = inLogged,
-                onValueChange = { inLogged = it },
+                value = inDate,
+                onValueChange = { inDate = it },
                 label = { Text(stringResource(R.string.foodLoged)) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -168,7 +168,7 @@ class MainActivity : ComponentActivity() {
             Button(
                 onClick = {
                     var specimen = FoodAmount().apply {
-                        //foodName = inFoodName
+                        foodName = inFoodName
                         /*foodId = (selectedFood?.let(){
                             it.id
                         } ?: 0) as String*/
@@ -178,12 +178,12 @@ class MainActivity : ComponentActivity() {
                         } ?: 0*/
                         foodAmount = inAmount
                         foodIntake = inIntake
-                        foodLogged = inLogged
+                        foodDate = inDate
                     }
                     viewModel.save(specimen)
                     Toast.makeText(
                         context,
-                        "$inFoodName $inAmount $inIntake $inLogged",
+                        "$inFoodName $inAmount $inIntake $inDate",
                         Toast.LENGTH_LONG)
                         .show()
                 }
