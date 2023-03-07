@@ -1,6 +1,9 @@
 package com.projectit3048c
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,6 +20,8 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
 
     var foods: MutableLiveData<List<Food>> = MutableLiveData<List<Food>>()
     var foodAmounts: MutableLiveData<List<FoodAmount>> = MutableLiveData<List<FoodAmount>>()
+    var selectedFoodAmount by mutableStateOf(FoodAmount())
+    val NEW_FOODAMOUNT = "New Food"
 
     private lateinit var firestore : FirebaseFirestore
 
@@ -25,6 +30,8 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
         firestore.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
         listenToFoodSpecimens()
     }
+
+
 
     private fun listenToFoodSpecimens() {
         firestore.collection("specimens").addSnapshotListener {
@@ -37,6 +44,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
             //If we made it here, there is no error
             snapshot?.let {
                 val allFoodSpecimens = ArrayList<FoodAmount>()
+                allFoodSpecimens.add(FoodAmount(foodName = NEW_FOODAMOUNT))
                 val documents = snapshot.documents
                 documents.forEach {
                     val foodSpecimen = it.toObject(FoodAmount::class.java)
@@ -59,16 +67,16 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
         // TODO:  
     }
 
-    fun save(specimen: FoodAmount) {
-        val document = if (specimen.foodId == null || specimen.foodId.isEmpty()) {
+    fun saveFoodAmount() {
+        val document = if (selectedFoodAmount.foodId == null || selectedFoodAmount.foodId.isEmpty()) {
             //create new FoodAmount
             firestore.collection("specimens").document()
         } else {
             //update existing FoodAmount
-            firestore.collection("specimens").document(specimen.foodId)
+            firestore.collection("specimens").document(selectedFoodAmount.foodId)
         }
-        specimen.foodId = document.id
-        val handle = document.set(specimen)
+        selectedFoodAmount.foodId = document.id
+        val handle = document.set(selectedFoodAmount)
         handle.addOnSuccessListener { Log.d("Firebase", "Document Saved") }
         handle.addOnFailureListener { Log.e("Firebase", "Save failed $it ") }
     }

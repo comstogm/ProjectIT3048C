@@ -32,7 +32,7 @@ import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
-    private var selectedFoodAmount by mutableStateOf(FoodAmount())
+
     private var selectedFood: Food? = null
     private val viewModel : MainViewModel by viewModel<MainViewModel>()
     private var inFoodName: String = ""
@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colors.background) {
-                    CalorieFacts("Android", foods, foodAmounts, selectedFoodAmount)
+                    CalorieFacts("Android", foods, foodAmounts, viewModel.selectedFoodAmount)
                 }
                 var foo = foods
                 var i = 1 + 1
@@ -167,20 +167,16 @@ class MainActivity : ComponentActivity() {
             )
             Button(
                 onClick = {
-                    var specimen = FoodAmount().apply {
+                    selectedFoodAmount.apply {
                         foodName = inFoodName
-                        /*foodId = (selectedFood?.let(){
+                        internalFoodID = selectedFood?.let(){
                             it.id
-                        } ?: 0) as String*/
-                        /* casting to string to force it to work, should fix below version instead
-                        foodId = selectedFood?.let(){
-                            it.id
-                        } ?: 0*/
+                        } ?: 0
                         foodAmount = inAmount
                         foodIntake = inIntake
                         foodDate = inDate
                     }
-                    viewModel.save(specimen)
+                    viewModel.saveFoodAmount()
                     Toast.makeText(
                         context,
                         "$inFoodName $inAmount $inIntake $inDate",
@@ -246,9 +242,16 @@ class MainActivity : ComponentActivity() {
                 DropdownMenu(expanded = expanded, onDismissRequest = {expanded = false}) {
                     loggedFoods.forEach {
                         loggedFood -> DropdownMenuItem(onClick = {
-                            expanded = false
-                        loggedFoodText = loggedFood.toString()
-                        selectedFoodAmount = loggedFood
+                        expanded = false
+
+                        if (loggedFood.foodName == (viewModel.NEW_FOODAMOUNT)) {
+                            // new specimen to create
+                            loggedFoodText = ""
+                        } else {
+                            loggedFoodText = loggedFood.toString()
+                        }
+                        viewModel.selectedFoodAmount = loggedFood
+
                     }) {
                             Text(text = loggedFood.toString())
                     }
