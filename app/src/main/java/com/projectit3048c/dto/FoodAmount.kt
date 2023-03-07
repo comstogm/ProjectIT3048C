@@ -1,7 +1,12 @@
 package com.projectit3048c.dto
 
-data class FoodAmount(var foodId : Int = 0, var foodName : String = "", var foodIntake : String = "", var foodAmount : String = "", var foodLoged : String = "") {
+data class FoodAmount(var foodId: String = "", //firebase identifier
+                      var foodName: String = "",
+                      var internalFoodID: Int = 0,
+                      var foodIntake: String = "",
+                      var foodAmount: String = "",
+                      var foodDate: String = "") {
     override fun toString(): String {
-        return "$foodId $foodName $foodAmount $foodLoged"
+        return "$foodId $foodName $foodAmount $foodDate"
     }
 }
