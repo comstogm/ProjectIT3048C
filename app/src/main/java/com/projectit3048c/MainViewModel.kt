@@ -63,7 +63,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     fun save(specimen: FoodAmount) {
         val document = if (specimen.foodId == null || specimen.foodId.isEmpty()) {
             //create new FoodAmount
-            firestore.collection("FoodAmount").document()
+            firestore.collection("specimens").document()
         } else {
             //update existing FoodAmount
             firestore.collection("specimens").document(specimen.foodId)

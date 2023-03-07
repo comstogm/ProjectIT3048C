@@ -168,10 +168,10 @@ class MainActivity : ComponentActivity() {
             Button(
                 onClick = {
                     var specimen = FoodAmount().apply {
-                        foodName = inFoodName
-                        foodId = (selectedFood?.let(){
+                        //foodName = inFoodName
+                        /*foodId = (selectedFood?.let(){
                             it.id
-                        } ?: 0) as String
+                        } ?: 0) as String*/
                         /* casting to string to force it to work, should fix below version instead
                         foodId = selectedFood?.let(){
                             it.id
