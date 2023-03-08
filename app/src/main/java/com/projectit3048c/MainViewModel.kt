@@ -16,8 +16,8 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     fun fetchFoods() {
         viewModelScope.launch {
            var innerFoods = foodService.fetchFoods()
-            if (innerFoods != null) {
-                foods.postValue(innerFoods!!)
+            innerFoods?.let { nonNullFoods ->
+                foods.postValue(nonNullFoods)
             }
 
         }
