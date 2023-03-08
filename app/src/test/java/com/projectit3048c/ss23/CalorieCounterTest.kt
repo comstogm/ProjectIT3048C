@@ -29,13 +29,13 @@ class CalorieCounterTest {
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
-    lateinit var foodService: FoodService
+    private lateinit var foodService: FoodService
     var allFoods: List<Food>? = ArrayList<Food>()
 
     //lateinit var mvm: MainViewModel
 
     @MockK
-    lateinit var mockFoodService: FoodService
+    internal lateinit var mockFoodService: FoodService
 
     private val mainThreadSurrogate = newSingleThreadContext("Main Thread")
 
