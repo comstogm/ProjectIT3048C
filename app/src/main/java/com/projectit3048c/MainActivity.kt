@@ -1,6 +1,7 @@
 package com.projectit3048c
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,6 +25,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
+import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.projectit3048c.dto.Food
 import com.projectit3048c.dto.FoodItems
 import com.projectit3048c.dto.FoodAmount
@@ -32,7 +38,7 @@ import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
-
+    private var user: FirebaseUser? = FirebaseAuth.getInstance().currentUser
     private var selectedFood: Food? = null
     private val viewModel : MainViewModel by viewModel<MainViewModel>()
     private var inFoodName: String = ""
@@ -192,6 +198,8 @@ class MainActivity : ComponentActivity() {
             //  ViewModel.deleteSavedFoodDatabase(foodItems)
         }
 
+
+
         @Composable
         fun EventListItem(foodItems: FoodItems){
             Row {
@@ -209,9 +217,45 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
+
+                Button(
+                    onClick = {
+                        signIn()
+                    }
+                ){
+                    Text(text = "Logon")
+                }
             }
         }
     }
+
+    private val signInLauncher = registerForActivityResult(
+        FirebaseAuthUIActivityResultContract()
+    ) {
+            res -> this.signInResult(res)
+    }
+
+    private fun signIn() {
+        val providers = arrayListOf(
+            AuthUI.IdpConfig.EmailBuilder().build()
+        )
+        val signinIntent = AuthUI.getInstance()
+            .createSignInIntentBuilder()
+            .setAvailableProviders(providers)
+            .build()
+
+        signInLauncher.launch(signinIntent)
+    }
+
+    private fun signInResult(result: FirebaseAuthUIAuthenticationResult){
+        val response = result.idpResponse
+        if (result.resultCode == RESULT_OK){
+            user = FirebaseAuth.getInstance().currentUser
+        }else{
+            Log.e("MainActivity.ky", "Error logging in" + response?.error?.errorCode)
+        }
+    }
+
     @Preview(name="Light Mode", showBackground = true)
     @Composable
     fun DefaultPreview() {
