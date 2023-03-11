@@ -192,6 +192,13 @@ class MainActivity : ComponentActivity() {
             ) {
                 Text(text = "Add")
             }
+            Button(
+                onClick = {
+                    signIn()
+                }
+            ) {
+                Text(text = "Login")
+            }
         }
 
         fun delete(foodItems: FoodItems) {
