@@ -33,12 +33,13 @@ import com.google.firebase.auth.FirebaseUser
 import com.projectit3048c.dto.Food
 import com.projectit3048c.dto.FoodItems
 import com.projectit3048c.dto.FoodAmount
+import com.projectit3048c.dto.User
 import com.projectit3048c.ss23.R
 import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
-    private var user: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+    private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
     private var selectedFood: Food? = null
     private val viewModel : MainViewModel by viewModel<MainViewModel>()
     private var inFoodName: String = ""
@@ -48,6 +49,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             viewModel.fetchFoods()
+            firebaseUser?.let{
+                val user = User(it.uid, "")
+                viewModel.user = user
+                viewModel.listenToFoodSpecimens()
+            }
+
             val foods by viewModel.foods.observeAsState(initial = emptyList())
             val foodAmounts by viewModel.foodAmounts.observeAsState(initial = emptyList())
             ProjectIT3048CTheme {
@@ -257,7 +264,14 @@ class MainActivity : ComponentActivity() {
     private fun signInResult(result: FirebaseAuthUIAuthenticationResult){
         val response = result.idpResponse
         if (result.resultCode == RESULT_OK){
-            user = FirebaseAuth.getInstance().currentUser
+            firebaseUser = FirebaseAuth.getInstance().currentUser
+            firebaseUser?.let{
+                val user = User(it.uid, it.displayName)
+                viewModel.user = user
+                viewModel.saveUser()
+                viewModel.listenToFoodSpecimens()
+            }
+
         }else{
             Log.e("MainActivity.ky", "Error logging in" + response?.error?.errorCode)
         }
