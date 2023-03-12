@@ -8,10 +8,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -25,22 +23,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
-import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
-import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+//import com.firebase.ui.auth.AuthUI
+//import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
+//import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+//import com.google.firebase.auth.FirebaseAuth
+//import com.google.firebase.auth.FirebaseUser
 import com.projectit3048c.dto.Food
-import com.projectit3048c.dto.FoodItems
 import com.projectit3048c.dto.FoodAmount
 import com.projectit3048c.ss23.R
 import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
-    private var user: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+   // private var user: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+
+    private var selectedFoodAmount by mutableStateOf(FoodAmount())
     private var selectedFood: Food? = null
-    private val viewModel : MainViewModel by viewModel<MainViewModel>()
+    private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var inFoodName: String = ""
 
 
@@ -54,20 +53,108 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colors.background) {
-                    CalorieFacts("Android", foods, foodAmounts, viewModel.selectedFoodAmount)
+                    color = MaterialTheme.colors.background
+                )
+                {
+                   CalorieFacts("Android", foods, foodAmounts, viewModel.selectedFoodAmount)
                 }
-                var foo = foods
-                var i = 1 + 1
+            }
+        }
+    }
+
+
+//    private val signInLauncher = registerForActivityResult(
+//        FirebaseAuthUIActivityResultContract()
+//    ) {
+//            res -> this.signInResult(res)
+//    }
+
+//    private fun signIn() {
+//        val providers = arrayListOf(
+//            AuthUI.IdpConfig.EmailBuilder().build()
+//        )
+//        val signinIntent = AuthUI.getInstance()
+//            .createSignInIntentBuilder()
+//            .setAvailableProviders(providers)
+//            .build()
+//
+//        signInLauncher.launch(signinIntent)
+//    }
+
+//    private fun signInResult(result: FirebaseAuthUIAuthenticationResult){
+//        val response = result.idpResponse
+//        if (result.resultCode == RESULT_OK){
+//            user = FirebaseAuth.getInstance().currentUser
+//        }else{
+//            Log.e("MainActivity.ky", "Error logging in" + response?.error?.errorCode)
+//        }
+//    }
+
+    @Preview(name = "Light Mode", showBackground = true)
+    @Composable
+    fun DefaultPreview() {
+        ProjectIT3048CTheme {
+            Surface(
+                color = MaterialTheme.colors.background,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                CalorieFacts("Android")
+            }
+        }
+    }
+
+
+    @Composable
+    fun FoodAmountSpinner(loggedFoods: List<FoodAmount>) {
+        var loggedFoodText by remember { mutableStateOf("Logged Food Collection") }
+        var expanded by remember { mutableStateOf(false) }
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Row(Modifier
+                .padding(24.dp)
+                .clickable {
+                    expanded = !expanded
+                }
+                .padding(8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = loggedFoodText, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
+                Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "")
+                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                    loggedFoods.forEach {
+                            loggedFood -> DropdownMenuItem(onClick = {
+                            expanded = false
+                            loggedFoodText = loggedFood.toString()
+                            selectedFoodAmount = loggedFood
+//                            if (loggedFood.foodName == (viewModel.NEW_FOODAMOUNT)) {
+//                                // new specimen to create
+//                                loggedFoodText = ""
+//                                loggedFood.foodName = ""
+//                            } else {
+//                                loggedFoodText = loggedFood.toString()
+//                            }
+//                            viewModel.selectedFoodAmount = loggedFood
+
+                        }) {
+                            Text(text = loggedFood.toString())
+                        }
+                    }
+                }
             }
         }
     }
 
     @Composable
-    fun TextFieldWithDropdownUsage(dataIn: List<Food>?, label : String = "", take :Int = 3, selectedFoodAmount: FoodAmount) {
+    fun TextFieldWithDropdownUsage(
+        dataIn: List<Food>?,
+        label: String = "",
+        take: Int = 3,
+        selectedFoodAmount: FoodAmount
+    ) {
 
         val dropDownOptions = remember { mutableStateOf(listOf<Food>()) }
-        val textFieldValue = remember(selectedFoodAmount.foodId) {mutableStateOf(TextFieldValue(selectedFoodAmount.foodName)) }
+        val textFieldValue =
+            remember(selectedFoodAmount.foodId) { mutableStateOf(TextFieldValue(selectedFoodAmount.foodName)) }
         val dropDownExpanded = remember { mutableStateOf(false) }
 
         fun onDropdownDismissRequest() {
@@ -145,14 +232,23 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun CalorieFacts(name:String, foods: List<Food> = ArrayList<Food>(), loggedFoods: List<FoodAmount> = ArrayList<FoodAmount>(), selectedFoodAmount: FoodAmount = FoodAmount()) {
+    fun CalorieFacts(
+        name: String,
+        foods: List<Food> = ArrayList<Food>(),
+        loggedFoods: List<FoodAmount> = ArrayList<FoodAmount>(),
+        selectedFoodAmount: FoodAmount = FoodAmount()
+    ) {
         var inIntake by remember(selectedFoodAmount.foodIntake) { mutableStateOf(selectedFoodAmount.foodIntake) }
         var inDate by remember(selectedFoodAmount.foodDate) { mutableStateOf(selectedFoodAmount.foodDate) }
         var inAmount by remember(selectedFoodAmount.foodAmount) { mutableStateOf(selectedFoodAmount.foodAmount) }
         val context = LocalContext.current
         Column {
             FoodAmountSpinner(loggedFoods = loggedFoods)
-            TextFieldWithDropdownUsage(dataIn = foods, label = stringResource(R.string.foodName), selectedFoodAmount = selectedFoodAmount)
+            TextFieldWithDropdownUsage(
+                dataIn = foods,
+                label = stringResource(R.string.foodName),
+                selectedFoodAmount = selectedFoodAmount
+            )
             OutlinedTextField(
                 value = inIntake,
                 onValueChange = { inIntake = it },
@@ -175,18 +271,19 @@ class MainActivity : ComponentActivity() {
                 onClick = {
                     selectedFoodAmount.apply {
                         foodName = inFoodName
-                        internalFoodID = selectedFood?.let(){
+                        internalFoodID = selectedFood?.let() {
                             it.id
                         } ?: 0
                         foodAmount = inAmount
                         foodIntake = inIntake
                         foodDate = inDate
                     }
-                    viewModel.saveFoodAmount()
+                    viewModel.saveFoodAmount(selectedFoodAmount)
                     Toast.makeText(
                         context,
                         "$inFoodName $inAmount $inIntake $inDate",
-                        Toast.LENGTH_LONG)
+                        Toast.LENGTH_LONG
+                    )
                         .show()
                 }
             ) {
@@ -194,115 +291,44 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        fun delete(foodItems: FoodItems) {
+        fun delete(foodItems: FoodAmount) {
             //  ViewModel.deleteSavedFoodDatabase(foodItems)
-        }
-
-
-
-        @Composable
-        fun EventListItem(foodItems: FoodItems){
-            Row {
-                Column(Modifier.weight(6f)) {
-                    Text(text = foodItems.fdcId, style=typography.h6)
-                    Text(text = foodItems.description, style=typography.caption)
-                }
-                Column(Modifier.weight(1f)) {
-                    Button (
-                        onClick = {delete(foodItems)}
-                    ){
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = "Delete"
-                        )
-                    }
-                }
-
-                Button(
-                    onClick = {
-                        signIn()
-                    }
-                ){
-                    Text(text = "Logon")
-                }
-            }
-        }
-    }
-
-    private val signInLauncher = registerForActivityResult(
-        FirebaseAuthUIActivityResultContract()
-    ) {
-            res -> this.signInResult(res)
-    }
-
-    private fun signIn() {
-        val providers = arrayListOf(
-            AuthUI.IdpConfig.EmailBuilder().build()
-        )
-        val signinIntent = AuthUI.getInstance()
-            .createSignInIntentBuilder()
-            .setAvailableProviders(providers)
-            .build()
-
-        signInLauncher.launch(signinIntent)
-    }
-
-    private fun signInResult(result: FirebaseAuthUIAuthenticationResult){
-        val response = result.idpResponse
-        if (result.resultCode == RESULT_OK){
-            user = FirebaseAuth.getInstance().currentUser
-        }else{
-            Log.e("MainActivity.ky", "Error logging in" + response?.error?.errorCode)
-        }
-    }
-
-    @Preview(name="Light Mode", showBackground = true)
-    @Composable
-    fun DefaultPreview() {
-        ProjectIT3048CTheme {
-            Surface(color = MaterialTheme.colors.background,
-                modifier = Modifier.fillMaxWidth()) {
-                CalorieFacts("Android")
-            }
-        }
-    }
-
-    @Composable
-    fun FoodAmountSpinner (loggedFoods: List<FoodAmount>) {
-        var loggedFoodText by remember { mutableStateOf("Logged Food Collection") }
-        var expanded by remember { mutableStateOf(false) }
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            Row(Modifier
-                .padding(24.dp)
-                .clickable {
-                    expanded = !expanded
-                }
-                .padding(8.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = loggedFoodText, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
-                Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "")
-                DropdownMenu(expanded = expanded, onDismissRequest = {expanded = false}) {
-                    loggedFoods.forEach {
-                        loggedFood -> DropdownMenuItem(onClick = {
-                        expanded = false
-
-                        if (loggedFood.foodName == (viewModel.NEW_FOODAMOUNT)) {
-                            // new specimen to create
-                            loggedFoodText = ""
-                        } else {
-                            loggedFoodText = loggedFood.toString()
-                        }
-                        viewModel.selectedFoodAmount = loggedFood
-
-                    }) {
-                            Text(text = loggedFood.toString())
-                    }
-                    }
-                }
-            }
         }
     }
 }
+
+
+
+//        @Composable
+//        fun EventListItem(foodAmount: FoodAmount){
+//            Row {
+//                Column(Modifier.weight(6f)) {
+//                    Text(text = foodAmount.fdcId, style=typography.h6)
+//                    Text(text = foodAmount.description, style=typography.caption)
+//                }
+//                Column(Modifier.weight(1f)) {
+//                    Button (
+//                        onClick = {delete(foodAmount)}
+                   // ){
+                        //Icon(
+                           // imageVector = Icons.Filled.Delete,
+                            //contentDescription = "Delete"
+                      //  )
+                    //}
+               // }
+              //  Button(
+                   // onClick = {
+                      //  signIn()
+                  //  }
+               // ){
+                   // Text(text = "Logon")
+               // }
+          //  }
+       // }
+   // }
+
+
+
+
+
 
