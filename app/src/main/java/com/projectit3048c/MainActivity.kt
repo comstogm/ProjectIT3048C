@@ -251,13 +251,13 @@ class MainActivity : ComponentActivity() {
 
     private fun signIn() {
         val providers = arrayListOf(
-            AuthUI.IdpConfig.EmailBuilder().build()
+            AuthUI.IdpConfig.EmailBuilder().build(),
+            AuthUI.IdpConfig.GoogleBuilder().build()
         )
         val signinIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
             .build()
-
         signInLauncher.launch(signinIntent)
     }
 
@@ -271,7 +271,6 @@ class MainActivity : ComponentActivity() {
                 viewModel.saveUser()
                 viewModel.listenToFoodSpecimens()
             }
-
         }else{
             Log.e("MainActivity.ky", "Error logging in" + response?.error?.errorCode)
         }
