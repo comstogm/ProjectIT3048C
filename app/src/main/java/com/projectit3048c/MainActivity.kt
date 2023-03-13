@@ -31,7 +31,6 @@ import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.projectit3048c.dto.Food
-import com.projectit3048c.dto.FoodItems
 import com.projectit3048c.dto.FoodAmount
 import com.projectit3048c.dto.User
 import com.projectit3048c.ss23.R
@@ -44,7 +43,6 @@ class MainActivity : ComponentActivity() {
     private val viewModel : MainViewModel by viewModel<MainViewModel>()
     private var inFoodName: String = ""
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -54,7 +52,6 @@ class MainActivity : ComponentActivity() {
                 viewModel.user = user
                 viewModel.listenToFoodSpecimens()
             }
-
             val foods by viewModel.foods.observeAsState(initial = emptyList())
             val foodAmounts by viewModel.foodAmounts.observeAsState(initial = emptyList())
             ProjectIT3048CTheme {
@@ -64,23 +61,18 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background) {
                     CalorieFacts("Android", foods, foodAmounts, viewModel.selectedFoodAmount)
                 }
-                var foo = foods
-                var i = 1 + 1
             }
         }
     }
 
     @Composable
     fun TextFieldWithDropdownUsage(dataIn: List<Food>?, label : String = "", take :Int = 3, selectedFoodAmount: FoodAmount) {
-
         val dropDownOptions = remember { mutableStateOf(listOf<Food>()) }
         val textFieldValue = remember(selectedFoodAmount.foodId) {mutableStateOf(TextFieldValue(selectedFoodAmount.foodName)) }
         val dropDownExpanded = remember { mutableStateOf(false) }
-
         fun onDropdownDismissRequest() {
             dropDownExpanded.value = false
         }
-
         fun onValueChanged(value: TextFieldValue) {
             inFoodName = value.text
             dropDownExpanded.value = true
@@ -89,7 +81,6 @@ class MainActivity : ComponentActivity() {
                 it.toString().startsWith(value.text) && it.toString() != value.text
             }!!.take(take)
         }
-
         TextFieldWithDropdown(
             modifier = Modifier.fillMaxWidth(),
             value = textFieldValue.value,
@@ -207,23 +198,20 @@ class MainActivity : ComponentActivity() {
                 Text(text = "Login")
             }
         }
-
-        fun delete(foodItems: FoodItems) {
-            //  ViewModel.deleteSavedFoodDatabase(foodItems)
+        fun delete(foodAmounts: FoodAmount) {
+            //  ViewModel.deleteSavedFoodDatabase(foodAmounts)
         }
 
-
-
         @Composable
-        fun EventListItem(foodItems: FoodItems){
+        fun EventListItem(foodAmounts: FoodAmount){
             Row {
                 Column(Modifier.weight(6f)) {
-                    Text(text = foodItems.fdcId, style=typography.h6)
-                    Text(text = foodItems.description, style=typography.caption)
+                    Text(text = foodAmounts.foodId, style=typography.h6)
+                    Text(text = foodAmounts.foodName, style=typography.caption)
                 }
                 Column(Modifier.weight(1f)) {
                     Button (
-                        onClick = {delete(foodItems)}
+                        onClick = {delete(foodAmounts)}
                     ){
                         Icon(
                             imageVector = Icons.Filled.Delete,
@@ -231,7 +219,6 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
-
                 Button(
                     onClick = {
                         signIn()

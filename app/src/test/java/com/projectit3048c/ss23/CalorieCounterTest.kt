@@ -23,20 +23,14 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 class CalorieCounterTest {
-
     lateinit var mvm: MainViewModel
-
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
-
     lateinit var foodService: FoodService
     var allFoods: List<Food>? = ArrayList<Food>()
 
-    //lateinit var mvm: MainViewModel
-
     @MockK
     lateinit var mockFoodService: FoodService
-
     private val mainThreadSurrogate = newSingleThreadContext("Main Thread")
 
     @Before
@@ -85,7 +79,6 @@ class CalorieCounterTest {
         val food: Food = Food(3, "Egg", "1 egg", 155)
         assertEquals("Egg", food.toString())
     }
-
 
     @Test
     fun `giving a view model with live data when populated with foods then result show Apple`() {
