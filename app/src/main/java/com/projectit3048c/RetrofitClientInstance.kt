@@ -16,4 +16,4 @@ object RetrofitClientInstance {
             }
             return retrofit
         }
-}
+    }

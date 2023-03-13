@@ -11,28 +11,22 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.projectit3048c.dto.Food
 import com.projectit3048c.dto.FoodAmount
-import com.projectit3048c.dto.FoodItems
 import com.projectit3048c.dto.User
 import kotlinx.coroutines.launch
 import com.projectit3048c.service.FoodService
 import com.projectit3048c.service.IFoodService
 
 class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel() {
-
     var foods: MutableLiveData<List<Food>> = MutableLiveData<List<Food>>()
     var foodAmounts: MutableLiveData<List<FoodAmount>> = MutableLiveData<List<FoodAmount>>()
     var selectedFoodAmount by mutableStateOf(FoodAmount())
     val NEW_FOODAMOUNT = "New Food"
     var user: User? = null
-
     private lateinit var firestore : FirebaseFirestore
-
     init {
         firestore = FirebaseFirestore.getInstance()
         firestore.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
     }
-
-
 
     fun listenToFoodSpecimens() {
         user?.let{
@@ -59,7 +53,6 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
                 }
             }
         }
-
     }
 
     fun fetchFoods() {
@@ -68,7 +61,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
            foods.postValue(innerFoods!!)
         }
     }
-    internal fun deleteSavedFoodDatabase(foodItems: FoodItems){
+    internal fun deleteSavedFoodDatabase(foodAmounts: FoodAmount){
         // TODO:  
     }
 
@@ -87,7 +80,6 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
             handle.addOnSuccessListener { Log.d("Firebase", "Document Saved") }
             handle.addOnFailureListener { Log.e("Firebase", "Save failed $it ") }
         }
-
     }
 
     fun saveUser() {
@@ -97,6 +89,5 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
             handle.addOnSuccessListener { Log.d("Firebase", "Document Saved") }
             handle.addOnFailureListener { Log.e("Firebase", "Save failed $it ") }
         }
-
     }
 }

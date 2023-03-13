@@ -17,5 +17,4 @@ class MyCalorieCounterApplication : Application() {
             modules(appModule)
         }
     }
-
 }
