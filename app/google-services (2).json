@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1059321443335",
+    "project_id": "my-calorie-counter-bc57b",
+    "storage_bucket": "my-calorie-counter-bc57b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1059321443335:android:e4423f7b841ceabcc226a2",
+        "android_client_info": {
+          "package_name": "com.projectit3048c.ss23"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1059321443335-3i9t0gr0kaig50j173jarp76d38rmfag.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.projectit3048c.ss23",
+            "certificate_hash": "f5b470bbf122dcf8f349ca1d4aa2251adc418e8d"
+          }
+        },
+        {
+          "client_id": "1059321443335-lrh10ug514deih9t0rf5rjr3t7dkevuj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANUMpuyXUgUiB914S-dfEtymcWz8L2u4s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1059321443335-7akvrde75cbs633rnigl51j2m96hk740.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

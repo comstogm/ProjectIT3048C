@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.projectit3048c.dto.Food
 import com.projectit3048c.dto.FoodAmount
 import com.projectit3048c.dto.FoodItems
+import com.projectit3048c.dto.User
 import kotlinx.coroutines.launch
 import com.projectit3048c.service.FoodService
 import com.projectit3048c.service.IFoodService
@@ -22,39 +23,43 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     var foodAmounts: MutableLiveData<List<FoodAmount>> = MutableLiveData<List<FoodAmount>>()
     var selectedFoodAmount by mutableStateOf(FoodAmount())
     val NEW_FOODAMOUNT = "New Food"
+    var user: User? = null
 
     private lateinit var firestore : FirebaseFirestore
 
     init {
         firestore = FirebaseFirestore.getInstance()
         firestore.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
-        listenToFoodSpecimens()
     }
 
 
 
-    private fun listenToFoodSpecimens() {
-        firestore.collection("specimens").addSnapshotListener {
-                snapshot, e ->
-            //handle error
-            if(e != null) {
-                Log.w("Listen failed", e)
-                return@addSnapshotListener
-            }
-            //If we made it here, there is no error
-            snapshot?.let {
-                val allFoodSpecimens = ArrayList<FoodAmount>()
-                allFoodSpecimens.add(FoodAmount(foodName = NEW_FOODAMOUNT))
-                val documents = snapshot.documents
-                documents.forEach {
-                    val foodSpecimen = it.toObject(FoodAmount::class.java)
-                    foodSpecimen?.let {
-                        allFoodSpecimens.add(it)
-                    }
+    fun listenToFoodSpecimens() {
+        user?.let{
+            user ->
+            firestore.collection("users").document(user.uid).collection("specimens").addSnapshotListener {
+                    snapshot, e ->
+                //handle error
+                if(e != null) {
+                    Log.w("Listen failed", e)
+                    return@addSnapshotListener
                 }
-                foodAmounts.value = allFoodSpecimens
+                //If we made it here, there is no error
+                snapshot?.let {
+                    val allFoodSpecimens = ArrayList<FoodAmount>()
+                    allFoodSpecimens.add(FoodAmount(foodName = NEW_FOODAMOUNT))
+                    val documents = snapshot.documents
+                    documents.forEach {
+                        val foodSpecimen = it.toObject(FoodAmount::class.java)
+                        foodSpecimen?.let {
+                            allFoodSpecimens.add(it)
+                        }
+                    }
+                    foodAmounts.value = allFoodSpecimens
+                }
             }
         }
+
     }
 
     fun fetchFoods() {
@@ -68,16 +73,30 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     }
 
     fun saveFoodAmount() {
-        val document = if (selectedFoodAmount.foodId == null || selectedFoodAmount.foodId.isEmpty()) {
-            //create new FoodAmount
-            firestore.collection("specimens").document()
-        } else {
-            //update existing FoodAmount
-            firestore.collection("specimens").document(selectedFoodAmount.foodId)
+        user?.let {
+            user ->
+            val document = if (selectedFoodAmount.foodId == null || selectedFoodAmount.foodId.isEmpty()) {
+                //create new FoodAmount
+                firestore.collection("users").document(user.uid).collection("specimens").document()
+            } else {
+                //update existing FoodAmount
+                firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId)
+            }
+            selectedFoodAmount.foodId = document.id
+            val handle = document.set(selectedFoodAmount)
+            handle.addOnSuccessListener { Log.d("Firebase", "Document Saved") }
+            handle.addOnFailureListener { Log.e("Firebase", "Save failed $it ") }
         }
-        selectedFoodAmount.foodId = document.id
-        val handle = document.set(selectedFoodAmount)
-        handle.addOnSuccessListener { Log.d("Firebase", "Document Saved") }
-        handle.addOnFailureListener { Log.e("Firebase", "Save failed $it ") }
+
+    }
+
+    fun saveUser() {
+        user?.let{
+            user ->
+            val handle = firestore.collection("users").document(user.uid).set(user)
+            handle.addOnSuccessListener { Log.d("Firebase", "Document Saved") }
+            handle.addOnFailureListener { Log.e("Firebase", "Save failed $it ") }
+        }
+
     }
 }
