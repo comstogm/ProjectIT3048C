@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
         android:name="com.projectit3048c.MyCalorieCounterApplication"
@@ -36,5 +38,4 @@
                 />
         </provider>
     </application>
-
 </manifest>

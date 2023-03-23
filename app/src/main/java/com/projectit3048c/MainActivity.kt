@@ -1,10 +1,13 @@
 package com.projectit3048c
 
+import android.Manifest
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -25,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
+import androidx.core.content.ContextCompat
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
@@ -197,7 +201,16 @@ class MainActivity : ComponentActivity() {
             ) {
                 Text(text = "Login")
             }
+            Button(
+                onClick = {
+                    takePhoto()
+                }
+            ) {
+                Text(text = "Photo")
+            }
         }
+
+
         fun delete(foodAmounts: FoodAmount) {
             //  ViewModel.deleteSavedFoodDatabase(foodAmounts)
         }
@@ -229,6 +242,42 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun takePhoto() {
+        if (hasCameraPermission() == PERMISSION_GRANTED && hasExternalStoragePermission() == PERMISSION_GRANTED) {
+            invokeCamera()
+        } else {
+            requestMultiplePermissionsLauncher.launch(arrayOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA
+            ))
+        }
+    }
+
+    private val requestMultiplePermissionsLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        resultsMap ->
+        var permissionGranted = false
+        resultsMap.forEach {
+            if (it.value == true) {
+                permissionGranted = it.value
+            } else {
+                permissionGranted = false
+                return@forEach
+            }
+        }
+        if (permissionGranted) {
+            invokeCamera()
+        } else {
+            Toast.makeText(this, "Unable to load camera without permission.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun invokeCamera() {
+        TODO("Not yet implemented")
+    }
+
+    fun hasCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+    fun hasExternalStoragePermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
