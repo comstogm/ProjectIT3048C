@@ -1,10 +1,10 @@
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
     <external-files-path
         name="my_images"
-        path="Android/data//files/Pictures"/>
+        path="Android/data/com.projectit3048c.ss23/files/Pictures"/>
     <external-files-path
         name="my_debug_images"
-        path="/storage/emulated/0/Android/data//files/Pictures/"/>
+        path="/storage/emulated/0/Android/data/com.projectit3048c.ss23/files/Pictures/"/>
     <external-files-path
         name="my_root_images"
         path="/"/>
