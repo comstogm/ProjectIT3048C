@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import coil.compose.AsyncImage
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
@@ -56,6 +57,7 @@ class MainActivity : ComponentActivity() {
     private var selectedFood: Food? = null
     private val viewModel : MainViewModel by viewModel<MainViewModel>()
     private var inFoodName: String = ""
+    private var strUri by mutableStateOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -164,7 +166,11 @@ class MainActivity : ComponentActivity() {
         val context = LocalContext.current
         Column {
             FoodAmountSpinner(loggedFoods = loggedFoods)
-            TextFieldWithDropdownUsage(dataIn = foods, label = stringResource(R.string.foodName), selectedFoodAmount = selectedFoodAmount)
+            TextFieldWithDropdownUsage(
+                dataIn = foods,
+                label = stringResource(R.string.foodName),
+                selectedFoodAmount = selectedFoodAmount
+            )
             OutlinedTextField(
                 value = inIntake,
                 onValueChange = { inIntake = it },
@@ -187,7 +193,7 @@ class MainActivity : ComponentActivity() {
                 onClick = {
                     selectedFoodAmount.apply {
                         foodName = inFoodName
-                        internalFoodID = selectedFood?.let(){
+                        internalFoodID = selectedFood?.let() {
                             it.id
                         } ?: 0
                         foodAmount = inAmount
@@ -198,7 +204,8 @@ class MainActivity : ComponentActivity() {
                     Toast.makeText(
                         context,
                         "$inFoodName $inAmount $inIntake $inDate",
-                        Toast.LENGTH_LONG)
+                        Toast.LENGTH_LONG
+                    )
                         .show()
                 }
             ) {
@@ -218,6 +225,8 @@ class MainActivity : ComponentActivity() {
             ) {
                 Text(text = "Photo")
             }
+            AsyncImage(model = strUri, contentDescription = "Food Image")
+
         }
 
 
@@ -297,7 +306,7 @@ class MainActivity : ComponentActivity() {
         var timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         var imageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
-            "Specimen_${timestamp}",
+            "loggedFood_${timestamp}",
             ".jpg",
                 imageDirectory
         ).apply{
@@ -309,6 +318,7 @@ class MainActivity : ComponentActivity() {
         success ->
         if (success) {
             Log.i(TAG, "Image Location: $uri")
+            strUri = uri.toString()
         } else {
             Log.e(TAG, "Image not saved. $uri")
         }
