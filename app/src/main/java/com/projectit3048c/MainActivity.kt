@@ -1,15 +1,19 @@
 package com.projectit3048c
 
+import android.Manifest
+import android.content.ContentValues.TAG
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
-
-
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -37,6 +41,9 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import coil.compose.AsyncImage
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
@@ -48,12 +55,19 @@ import com.projectit3048c.dto.User
 import com.projectit3048c.ss23.R
 import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : ComponentActivity() {
+    private var uri: Uri? = null
+    private lateinit var currentImagePath: String
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
     private var selectedFood: Food? = null
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var inFoodName: String = ""
+    private var strUri by mutableStateOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -278,7 +292,18 @@ class MainActivity : ComponentActivity() {
             ) {
                 Text(text = "Login")
             }
+            Button(
+                onClick = {
+                    takePhoto()
+                }
+            ) {
+                Text(text = "Photo")
+            }
+            AsyncImage(model = strUri, contentDescription = "Food Image")
+
         }
+
+
         fun delete(foodAmounts: FoodAmount) {
             //  ViewModel.deleteSavedFoodDatabase(foodAmounts)
         }
@@ -310,6 +335,71 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun takePhoto() {
+        if (hasCameraPermission() == PERMISSION_GRANTED && hasExternalStoragePermission() == PERMISSION_GRANTED) {
+            invokeCamera()
+        } else {
+            requestMultiplePermissionsLauncher.launch(arrayOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA
+            ))
+        }
+    }
+
+    private val requestMultiplePermissionsLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        resultsMap ->
+        var permissionGranted = false
+        resultsMap.forEach {
+            if (it.value == true) {
+                permissionGranted = it.value
+            } else {
+                permissionGranted = false
+                return@forEach
+            }
+        }
+        if (permissionGranted) {
+            invokeCamera()
+        } else {
+            Toast.makeText(this, "Unable to load camera without permission.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun invokeCamera() {
+        val file = createImageFile()
+        try {
+            uri = FileProvider.getUriForFile(this, "com.projectit3048c.ss23.fileprovider", file)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error: ${e.message}")
+            var foo = e.message
+        }
+        getCameraImage.launch(uri)
+    }
+
+    private fun createImageFile() : File {
+        var timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        var imageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "loggedFood_${timestamp}",
+            ".jpg",
+                imageDirectory
+        ).apply{
+            currentImagePath = absolutePath
+        }
+    }
+
+    private val getCameraImage = registerForActivityResult(ActivityResultContracts.TakePicture()) {
+        success ->
+        if (success) {
+            Log.i(TAG, "Image Location: $uri")
+            strUri = uri.toString()
+        } else {
+            Log.e(TAG, "Image not saved. $uri")
+        }
+    }
+
+    fun hasCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+    fun hasExternalStoragePermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
