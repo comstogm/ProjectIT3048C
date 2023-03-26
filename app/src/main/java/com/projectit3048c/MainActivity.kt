@@ -78,7 +78,6 @@ class MainActivity : ComponentActivity() {
            }
     }
 
-
     @Composable
     fun CircleProgressBar(
         percentage: Float,
@@ -212,20 +211,20 @@ class MainActivity : ComponentActivity() {
         name: String,
         foods: List<Food> = ArrayList<Food>(),
         loggedFoods: List<FoodAmount> = ArrayList<FoodAmount>(),
-        selectedFoodAmount: FoodAmount = FoodAmount()
+        selectedFoodAmount: FoodAmount = FoodAmount(),
     ) {
         var inIntake by remember(selectedFoodAmount.foodIntake) { mutableStateOf(selectedFoodAmount.foodIntake) }
         var inDate by remember(selectedFoodAmount.foodDate) { mutableStateOf(selectedFoodAmount.foodDate) }
         var inAmount by remember(selectedFoodAmount.foodAmount) { mutableStateOf(selectedFoodAmount.foodAmount) }
         val context = LocalContext.current
         Column {
+            FoodAmountSpinner(loggedFoods = loggedFoods)
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxWidth()
             ){
                 CircleProgressBar(percentage = 0.8f, number = 100)
             }
-            FoodAmountSpinner(loggedFoods = loggedFoods)
             TextFieldWithDropdownUsage(
                 dataIn = foods,
                 label = stringResource(R.string.foodName),
