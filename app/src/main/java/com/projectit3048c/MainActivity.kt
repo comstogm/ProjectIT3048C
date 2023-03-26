@@ -51,6 +51,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.projectit3048c.dto.Food
 import com.projectit3048c.dto.FoodAmount
+import com.projectit3048c.dto.Photo
 import com.projectit3048c.dto.User
 import com.projectit3048c.ss23.R
 import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
@@ -393,6 +394,8 @@ class MainActivity : ComponentActivity() {
         if (success) {
             Log.i(TAG, "Image Location: $uri")
             strUri = uri.toString()
+            val photo = Photo(localUri = uri.toString())
+            viewModel.photos.add(photo)
         } else {
             Log.e(TAG, "Image not saved. $uri")
         }
