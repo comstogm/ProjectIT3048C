@@ -21,12 +21,13 @@ import com.projectit3048c.service.FoodService
 import com.projectit3048c.service.IFoodService
 
 class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel() {
-    val photos: ArrayList<Photo> = ArrayList<Photo>()
+    val photos: ArrayList<Photo> by mutableStateOf(ArrayList<Photo>())
     var foods: MutableLiveData<List<Food>> = MutableLiveData<List<Food>>()
     var foodAmounts: MutableLiveData<List<FoodAmount>> = MutableLiveData<List<FoodAmount>>()
     var selectedFoodAmount by mutableStateOf(FoodAmount())
     val NEW_FOODAMOUNT = "New Food"
     var user: User? = null
+    val eventPhotos : MutableLiveData<List<Photo>> = MutableLiveData<List<Photo>>()
     private lateinit var firestore : FirebaseFirestore
     private var storageReference = FirebaseStorage.getInstance().getReference()
     init {
@@ -116,21 +117,24 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
         }
     }
 
-    private fun updatePhotoDatabase(photo: Photo) {
+    internal fun updatePhotoDatabase(photo: Photo) {
         user?.let {
             user ->
-            var photoCollection = firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos")
-            var handle = photoCollection.add(photo)
+            var photoDocument = if (photo.id.isEmpty()) {
+                firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos").document()
+            } else {
+                firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos").document(photo.id)
+            }
+            photo.id = photoDocument.id
+            var handle = photoDocument.set(photo)
             handle.addOnSuccessListener {
                 Log.i(TAG, "Successfully update photo metadata")
-                photo.id = it.id
                 firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos").document(photo.id).set(photo)
             }
             handle.addOnFailureListener {
                 Log.e(TAG, "Error updating photo data: ${it.message}")
             }
         }
-
     }
 
     fun saveUser() {
@@ -139,6 +143,27 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
             val handle = firestore.collection("users").document(user.uid).set(user)
             handle.addOnSuccessListener { Log.d("Firebase", "Document Saved") }
             handle.addOnFailureListener { Log.e("Firebase", "Save failed $it ") }
+        }
+    }
+
+    fun fetchPhotos() {
+        photos.clear()
+        user?.let {
+            user ->
+            var photoCollection = firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos")
+            var photosListener = photoCollection.addSnapshotListener {
+                querySnapshot, firebaseFirestoreException ->
+                querySnapshot?.let {
+                    querySnapshot ->
+                    var documents = querySnapshot.documents
+                    documents?.forEach {
+                        var photo = it.toObject(Photo::class.java)
+                        photo?.let {
+                            photos.add(photo)
+                        }
+                    }
+                }
+            }
         }
     }
 }
