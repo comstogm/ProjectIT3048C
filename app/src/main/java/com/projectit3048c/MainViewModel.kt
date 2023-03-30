@@ -21,17 +21,16 @@ import com.projectit3048c.service.FoodService
 import com.projectit3048c.service.IFoodService
 
 class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel() {
-    val photos: ArrayList<Photo> by mutableStateOf(ArrayList<Photo>())
+    val photos: ArrayList<Photo> by mutableStateOf(ArrayList())
     var foods: MutableLiveData<List<Food>> = MutableLiveData<List<Food>>()
     var foodAmounts: MutableLiveData<List<FoodAmount>> = MutableLiveData<List<FoodAmount>>()
     var selectedFoodAmount by mutableStateOf(FoodAmount())
     val NEW_FOODAMOUNT = "New Food"
     var user: User? = null
     val eventPhotos : MutableLiveData<List<Photo>> = MutableLiveData<List<Photo>>()
-    private lateinit var firestore : FirebaseFirestore
-    private var storageReference = FirebaseStorage.getInstance().getReference()
+    private var firestore : FirebaseFirestore = FirebaseFirestore.getInstance()
+    private var storageReference = FirebaseStorage.getInstance().reference
     init {
-        firestore = FirebaseFirestore.getInstance()
         firestore.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
     }
 
@@ -64,7 +63,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
 
     fun fetchFoods() {
         viewModelScope.launch {
-           var innerFoods = foodService.fetchFoods()
+           val innerFoods = foodService.fetchFoods()
            foods.postValue(innerFoods!!)
         }
     }
@@ -75,7 +74,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     fun saveFoodAmount() {
         user?.let {
             user ->
-            val document = if (selectedFoodAmount.foodId == null || selectedFoodAmount.foodId.isEmpty()) {
+            val document = if (selectedFoodAmount.foodId.isEmpty()) {
                 //create new FoodAmount
                 firestore.collection("users").document(user.uid).collection("specimens").document()
             } else {
@@ -98,7 +97,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     private fun uploadPhotos() {
         photos.forEach {
             photo ->
-            var uri = Uri.parse(photo.localUri)
+            val uri = Uri.parse(photo.localUri)
             // nullable user entry creates technical debt. Wrap in let or enforce user on activity side.
             val imageRef = storageReference.child("images/${user?.uid}/${uri.lastPathSegment}")
             val uploadTask = imageRef.putFile(uri)
@@ -120,13 +119,13 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     internal fun updatePhotoDatabase(photo: Photo) {
         user?.let {
             user ->
-            var photoDocument = if (photo.id.isEmpty()) {
+            val photoDocument = if (photo.id.isEmpty()) {
                 firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos").document()
             } else {
                 firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos").document(photo.id)
             }
             photo.id = photoDocument.id
-            var handle = photoDocument.set(photo)
+            val handle = photoDocument.set(photo)
             handle.addOnSuccessListener {
                 Log.i(TAG, "Successfully update photo metadata")
                 firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos").document(photo.id).set(photo)
@@ -150,14 +149,14 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
         photos.clear()
         user?.let {
             user ->
-            var photoCollection = firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos")
+            val photoCollection = firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos")
             var photosListener = photoCollection.addSnapshotListener {
                 querySnapshot, firebaseFirestoreException ->
                 querySnapshot?.let {
                     querySnapshot ->
-                    var documents = querySnapshot.documents
-                    documents?.forEach {
-                        var photo = it.toObject(Photo::class.java)
+                    val documents = querySnapshot.documents
+                    documents.forEach {
+                        val photo = it.toObject(Photo::class.java)
                         photo?.let {
                             photos.add(photo)
                         }

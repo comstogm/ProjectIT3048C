@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var currentImagePath: String
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
     private var selectedFood: Food? = null
-    private val viewModel: MainViewModel by viewModel<MainViewModel>()
+    private val viewModel: MainViewModel by viewModel()
     private var inFoodName: String = ""
     private var strUri by mutableStateOf("")
 
@@ -227,8 +227,8 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun CalorieFacts(
         name: String,
-        foods: List<Food> = ArrayList<Food>(),
-        loggedFoods: List<FoodAmount> = ArrayList<FoodAmount>(),
+        foods: List<Food> = ArrayList(),
+        loggedFoods: List<FoodAmount> = ArrayList(),
         selectedFoodAmount: FoodAmount = FoodAmount(),
     ) {
         var inIntake by remember(selectedFoodAmount.foodIntake) { mutableStateOf(selectedFoodAmount.foodIntake) }
@@ -270,9 +270,7 @@ class MainActivity : ComponentActivity() {
                 onClick = {
                     selectedFoodAmount.apply {
                         foodName = inFoodName
-                        internalFoodID = selectedFood?.let() {
-                            it.id
-                        } ?: 0
+                        internalFoodID = selectedFood?.id ?: 0
                         foodAmount = inAmount
                         foodIntake = inIntake
                         foodDate = inDate
@@ -405,7 +403,7 @@ class MainActivity : ComponentActivity() {
         resultsMap ->
         var permissionGranted = false
         resultsMap.forEach {
-            if (it.value == true) {
+            if (it.value) {
                 permissionGranted = it.value
             } else {
                 permissionGranted = false
@@ -431,8 +429,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun createImageFile() : File {
-        var timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        var imageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val imageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
             "loggedFood_${timestamp}",
             ".jpg",
@@ -468,11 +466,11 @@ class MainActivity : ComponentActivity() {
             AuthUI.IdpConfig.EmailBuilder().build(),
             AuthUI.IdpConfig.GoogleBuilder().build()
         )
-        val signinIntent = AuthUI.getInstance()
+        val signInIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
             .build()
-        signInLauncher.launch(signinIntent)
+        signInLauncher.launch(signInIntent)
     }
 
     private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
