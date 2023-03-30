@@ -29,7 +29,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     var user: User? = null
     val eventPhotos : MutableLiveData<List<Photo>> = MutableLiveData<List<Photo>>()
     private var firestore : FirebaseFirestore = FirebaseFirestore.getInstance()
-    private var storageReference = FirebaseStorage.getInstance().getReference()
+    private var storageReference = FirebaseStorage.getInstance().reference
     init {
         firestore.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
     }
@@ -74,7 +74,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     fun saveFoodAmount() {
         user?.let {
             user ->
-            val document = if (selectedFoodAmount.foodId == null || selectedFoodAmount.foodId.isEmpty()) {
+            val document = if (selectedFoodAmount.foodId.isEmpty()) {
                 //create new FoodAmount
                 firestore.collection("users").document(user.uid).collection("specimens").document()
             } else {
