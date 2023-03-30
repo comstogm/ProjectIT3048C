@@ -431,8 +431,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun createImageFile() : File {
-        var timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        var imageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val imageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
             "loggedFood_${timestamp}",
             ".jpg",
@@ -468,11 +468,11 @@ class MainActivity : ComponentActivity() {
             AuthUI.IdpConfig.EmailBuilder().build(),
             AuthUI.IdpConfig.GoogleBuilder().build()
         )
-        val signinIntent = AuthUI.getInstance()
+        val signInIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
             .build()
-        signInLauncher.launch(signinIntent)
+        signInLauncher.launch(signInIntent)
     }
 
     private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
