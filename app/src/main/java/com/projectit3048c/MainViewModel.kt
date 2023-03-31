@@ -28,6 +28,8 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     val NEW_FOODAMOUNT = "New Food"
     var user: User? = null
     val eventPhotos : MutableLiveData<List<Photo>> = MutableLiveData<List<Photo>>()
+
+
     private lateinit var firestore : FirebaseFirestore
     private var storageReference = FirebaseStorage.getInstance().getReference()
     init {
@@ -129,7 +131,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
             var handle = photoDocument.set(photo)
             handle.addOnSuccessListener {
                 Log.i(TAG, "Successfully update photo metadata")
-                firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos").document(photo.id).set(photo)
+                //firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos").document(photo.id).set(photo)
             }
             handle.addOnFailureListener {
                 Log.e(TAG, "Error updating photo data: ${it.message}")
@@ -159,6 +161,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
                     documents?.forEach {
                         var photo = it.toObject(Photo::class.java)
                         photo?.let {
+                            photo ->
                             photos.add(photo)
                         }
                     }

@@ -266,43 +266,45 @@ class MainActivity : ComponentActivity() {
                 label = { Text(stringResource(R.string.foodAmount)) },
                 modifier = Modifier.fillMaxWidth()
             )
-            Button(
-                onClick = {
-                    selectedFoodAmount.apply {
-                        foodName = inFoodName
-                        internalFoodID = selectedFood?.let() {
-                            it.id
-                        } ?: 0
-                        foodAmount = inAmount
-                        foodIntake = inIntake
-                        foodDate = inDate
+
+            Row(modifier = Modifier.padding(all = 2.dp)) {
+                Button(
+                    onClick = {
+                        selectedFoodAmount.apply {
+                            foodName = inFoodName
+                            internalFoodID = selectedFood?.let() {
+                                it.id
+                            } ?: 0
+                            foodAmount = inAmount
+                            foodIntake = inIntake
+                            foodDate = inDate
+                        }
+                        viewModel.saveFoodAmount()
+                        Toast.makeText(
+                            context,
+                            "$inFoodName $inAmount $inIntake $inDate",
+                            Toast.LENGTH_LONG
+                        )
+                            .show()
                     }
-                    viewModel.saveFoodAmount()
-                    Toast.makeText(
-                        context,
-                        "$inFoodName $inAmount $inIntake $inDate",
-                        Toast.LENGTH_LONG
-                    )
-                        .show()
+                ) {
+                    Text(text = "Add")
                 }
-            ) {
-                Text(text = "Add")
-            }
-            Button(
-                onClick = {
-                    signIn()
+                Button(
+                    onClick = {
+                        signIn()
+                    }
+                ) {
+                    Text(text = "Login")
                 }
-            ) {
-                Text(text = "Login")
-            }
-            Button(
-                onClick = {
-                    takePhoto()
+                Button(
+                    onClick = {
+                        takePhoto()
+                    }
+                ) {
+                    Text(text = "Photo")
                 }
-            ) {
-                Text(text = "Photo")
             }
-            AsyncImage(model = strUri, contentDescription = "Food Image")
             Events()
         }
 
@@ -386,7 +388,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun save(photo: Photo): () -> Unit {
+    private fun save(photo: Photo) {
         viewModel.updatePhotoDatabase(photo)
     }
 
