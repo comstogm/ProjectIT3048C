@@ -57,10 +57,15 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
 
     fun fetchFoods() {
         viewModelScope.launch {
-           var innerFoods = foodService.fetchFoods()
-           foods.postValue(innerFoods!!)
+            try {
+                val innerFoods = foodService.fetchFoods() ?: throw Exception("Failed to fetch foods")
+                foods.postValue(innerFoods)
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Failed to fetch foods", e)
+            }
         }
     }
+
     internal fun deleteSavedFoodDatabase(foodAmounts: FoodAmount){
         // TODO:  
     }
