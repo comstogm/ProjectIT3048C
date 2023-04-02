@@ -22,7 +22,9 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     var selectedFoodAmount by mutableStateOf(FoodAmount())
     val NEW_FOODAMOUNT = "New Food"
     var user: User? = null
-    private lateinit var firestore : FirebaseFirestore
+    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance().apply {
+        firestoreSettings = FirebaseFirestoreSettings.Builder().build()
+    }
     init {
         firestore = FirebaseFirestore.getInstance()
         firestore.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
