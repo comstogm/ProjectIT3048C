@@ -79,7 +79,7 @@ class MainActivity : ComponentActivity() {
             textFieldValue.value = value
             dropDownOptions.value = dataIn?.filter {
                 it.toString().startsWith(value.text) && it.toString() != value.text
-            }!!.take(take)
+            }?.take(take) ?: emptyList()
         }
         TextFieldWithDropdown(
             modifier = Modifier.fillMaxWidth(),
