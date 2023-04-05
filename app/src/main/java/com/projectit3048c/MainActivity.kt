@@ -97,6 +97,86 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
+    fun TextFieldWithDropdownUsage(dataIn: List<Food>, label : String = "", selectedFoodAmount: FoodAmount = FoodAmount()) {
+
+        val dropDownOptions = remember { mutableStateOf(listOf<Food>()) }
+        val textFieldValue = remember(selectedFoodAmount.foodId) { mutableStateOf(TextFieldValue(selectedFoodAmount.foodName)) }
+        val dropDownExpanded = remember { mutableStateOf(false) }
+
+        fun onDropdownDismissRequest() {
+            dropDownExpanded.value = false
+        }
+
+        fun onValueChanged(value: TextFieldValue) {
+            inFoodName = value.text
+            dropDownExpanded.value = true
+            textFieldValue.value = value
+            dropDownOptions.value = dataIn.filter {
+                it.toString().startsWith(value.text) && it.toString() != value.text
+            }.take(3)
+        }
+
+        TextFieldWithDropdown(
+            modifier = Modifier.fillMaxWidth(),
+            value = textFieldValue.value,
+            setValue = ::onValueChanged,
+            onDismissRequest = ::onDropdownDismissRequest,
+            dropDownExpanded = dropDownExpanded.value,
+            list = dropDownOptions.value,
+            label = label
+        )
+    }
+
+    @Composable
+    fun TextFieldWithDropdown(
+        modifier: Modifier = Modifier,
+        value: TextFieldValue,
+        setValue: (TextFieldValue) -> Unit,
+        onDismissRequest: () -> Unit,
+        dropDownExpanded: Boolean,
+        list: List<Food>,
+        label: String = ""
+    ) {
+        Box(modifier) {
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { focusState ->
+                        if (!focusState.isFocused)
+                            onDismissRequest()
+                    },
+                value = value,
+                onValueChange = setValue,
+                label = { Text(label) },
+                colors = TextFieldDefaults.outlinedTextFieldColors()
+            )
+            DropdownMenu(
+                expanded = dropDownExpanded,
+                properties = PopupProperties(
+                    focusable = false,
+                    dismissOnBackPress = true,
+                    dismissOnClickOutside = true
+                ),
+                onDismissRequest = onDismissRequest
+            ) {
+                list.forEach { text ->
+                    DropdownMenuItem(onClick = {
+                        setValue(
+                            TextFieldValue(
+                                text.toString(),
+                                TextRange(text.toString().length)
+                            )
+                        )
+                        selectedFood = text
+                    }) {
+                        Text(text = text.toString())
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
     fun FoodAmountSpinner(foodAmountList: List<FoodAmount>) {
         var specimenText by remember { mutableStateOf("Logged Foods") }
         var expanded by remember { mutableStateOf(false) }
@@ -201,11 +281,11 @@ class MainActivity : ComponentActivity() {
             ){
                 CircleProgressBar(percentage = 0.8f, number = 100)
             }
-//            TextFieldWithDropdownUsage(
-//                dataIn = foods,
-//                label = stringResource(R.string.foodName),
-//                selectedFoodAmount = selectedFoodAmount
-//            )
+            TextFieldWithDropdownUsage(
+                dataIn = foods,
+                label = stringResource(R.string.foodName),
+                selectedFoodAmount = selectedFoodAmount
+            )
             OutlinedTextField(
                 value = inIntake,
                 onValueChange = { inIntake = it },
@@ -465,6 +545,5 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
 }
 
