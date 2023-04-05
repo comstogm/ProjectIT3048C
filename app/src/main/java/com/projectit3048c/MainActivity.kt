@@ -116,7 +116,17 @@ class MainActivity : ComponentActivity() {
                     foodAmountList.forEach {
                         DropdownMenuItem(onClick = {
                             expanded = false
-                            specimenText = it.toString()
+
+                            if (it.foodName == viewModel.NEW_FOODAMOUNT) {
+                                //We have a new Entry
+                                specimenText = ""
+                                it.foodName = ""
+                            } else {
+                                //We have selected an existing Entry
+                                specimenText = it.toString()
+                                selectedFood = Food(name = "", description = "", calories = 0)
+                                inFoodName = it.foodName
+                            }
                             viewModel.selectedFoodAmount = it
                         }) {
                             Text(text = it.toString())
