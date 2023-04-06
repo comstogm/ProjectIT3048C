@@ -208,6 +208,7 @@ class MainActivity : ComponentActivity() {
                                 inFoodName = it.foodName
                             }
                             viewModel.selectedFoodAmount = it
+                            viewModel.fetchPhotos()
                         }) {
                             Text(text = it.toString())
                         }
