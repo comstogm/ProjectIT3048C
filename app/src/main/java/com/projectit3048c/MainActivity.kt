@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
@@ -30,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
@@ -46,16 +44,14 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.fragment.app.FragmentActivity
 import coil.compose.AsyncImage
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.projectit3048c.dto.Food
-import com.projectit3048c.dto.FoodAmount
-import com.projectit3048c.dto.Photo
-import com.projectit3048c.dto.User
+import com.projectit3048c.dto.*
 import com.projectit3048c.ss23.R
 import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -64,7 +60,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity(){
     private var uri: Uri? = null
     private lateinit var currentImagePath: String
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
@@ -75,6 +71,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             viewModel.fetchFoods()
             firebaseUser?.let {
@@ -93,63 +90,15 @@ class MainActivity : ComponentActivity() {
                     CalorieFacts("Android", foods, foodAmounts, viewModel.selectedFoodAmount)
                 }
             }
-           }
-    }
-
-    @Composable
-    fun CircleProgressBar(
-        percentage: Float,
-        number: Int,
-        fontSize: TextUnit = 40.sp,
-        radius: Dp = 80.dp,
-        animDuration: Int = 2000,
-        animDelay: Int = 0
-    ) {
-        var animationPlayed by remember {
-            mutableStateOf(false)
-        }
-        val curPercentage = animateFloatAsState(
-            targetValue = if (animationPlayed) percentage else 0f,
-            animationSpec = tween(
-                durationMillis = animDuration,
-                delayMillis = animDelay
-            )
-        )
-        LaunchedEffect(key1 = true) {
-            animationPlayed = true
-        }
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.size(radius * 2f)
-        ) {
-            Canvas(modifier = Modifier.size(radius * 2f)) {
-                drawArc(
-                    color = Color.LightGray,
-                    -90f,
-                    360 * curPercentage.value,
-                    useCenter = false,
-                    style = Stroke(width = 20f, cap = StrokeCap.Round)
-                )
-            }
-            Text(
-                text = (curPercentage.value * number).toInt().toString(),
-                color = Color.DarkGray,
-                fontSize = fontSize,
-                fontWeight = FontWeight.Bold
-            )
         }
     }
 
+
     @Composable
-    fun TextFieldWithDropdownUsage(
-        dataIn: List<Food>?,
-        label: String = "",
-        take: Int = 3,
-        selectedFoodAmount: FoodAmount
-    ) {
+    fun TextFieldWithDropdownUsage(dataIn: List<Food>, label : String = "", selectedFoodAmount: FoodAmount = FoodAmount()) {
+
         val dropDownOptions = remember { mutableStateOf(listOf<Food>()) }
-        val textFieldValue =
-            remember(selectedFoodAmount.foodId) { mutableStateOf(TextFieldValue(selectedFoodAmount.foodName)) }
+        val textFieldValue = remember(selectedFoodAmount.foodId) { mutableStateOf(TextFieldValue(selectedFoodAmount.foodName)) }
         val dropDownExpanded = remember { mutableStateOf(false) }
         fun onDropdownDismissRequest() {
             dropDownExpanded.value = false
@@ -159,9 +108,9 @@ class MainActivity : ComponentActivity() {
             inFoodName = value.text
             dropDownExpanded.value = true
             textFieldValue.value = value
-            dropDownOptions.value = dataIn?.filter {
+            dropDownOptions.value = dataIn.filter {
                 it.toString().startsWith(value.text) && it.toString() != value.text
-            }!!.take(take)
+            }.take(3)
         }
         TextFieldWithDropdown(
             modifier = Modifier.fillMaxWidth(),
@@ -231,12 +180,13 @@ class MainActivity : ComponentActivity() {
         loggedFoods: List<FoodAmount> = ArrayList<FoodAmount>(),
         selectedFoodAmount: FoodAmount = FoodAmount(),
     ) {
-        var inIntake by remember(selectedFoodAmount.foodIntake) { mutableStateOf(selectedFoodAmount.foodIntake) }
-        var inDate by remember(selectedFoodAmount.foodDate) { mutableStateOf(selectedFoodAmount.foodDate) }
-        var inAmount by remember(selectedFoodAmount.foodAmount) { mutableStateOf(selectedFoodAmount.foodAmount) }
+        var inIntake by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodIntake) }
+        var inDate by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodDate) }
+        var inAmount by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodAmount) }
         val context = LocalContext.current
         Column {
-            FoodAmountSpinner(loggedFoods = loggedFoods)
+            FoodAmountSpinner(foodAmountList = loggedFoods)
+
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxWidth()
@@ -304,6 +254,13 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Text(text = "Photo")
                 }
+                Button(
+                    onClick = {
+                        showDatePickerDialog()
+                    }
+                ) {
+                    Text(text = "Display Date Picker")
+                }
             }
             Events()
         }
@@ -340,6 +297,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun showDatePickerDialog() {
+        val datePickerFragment = DatePickerDialog()
+        datePickerFragment.show(supportFragmentManager, "datePickerDialog")
+    }
+
     @Composable
     private fun Events () {
         val photos by viewModel.eventPhotos.observeAsState(initial = emptyList())
@@ -358,7 +320,10 @@ class MainActivity : ComponentActivity() {
         var inDescription by remember(photo.id) {mutableStateOf(photo.description)}
         Row{
             Column(Modifier.weight(2f)) {
-                AsyncImage(model = photo.localUri, contentDescription = "Event Image", Modifier.width(64.dp).height(64.dp))
+                AsyncImage(model = photo.localUri, contentDescription = "Event Image",
+                    Modifier
+                        .width(64.dp)
+                        .height(64.dp))
             }
             Column(Modifier.weight(4f)) {
                 Text(text = photo.id, style = typography.h6)
@@ -506,8 +471,8 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun FoodAmountSpinner(loggedFoods: List<FoodAmount>) {
-        var loggedFoodText by remember { mutableStateOf("Logged Food Collection") }
+    fun FoodAmountSpinner(foodAmountList: List<FoodAmount>) {
+        var specimenText by remember { mutableStateOf("Logged Foods") }
         var expanded by remember { mutableStateOf(false) }
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Row(Modifier
@@ -519,35 +484,74 @@ class MainActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = loggedFoodText,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
+                Text(text = specimenText, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
                 Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "")
                 DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    loggedFoods.forEach { loggedFood ->
+                    foodAmountList.forEach {
                         DropdownMenuItem(onClick = {
                             expanded = false
 
-                            if (loggedFood.foodName == (viewModel.NEW_FOODAMOUNT)) {
-                                // new specimen to create
-                                loggedFoodText = ""
+                            if (it.foodName == viewModel.NEW_FOODAMOUNT) {
+                                //We have a new Entry
+                                specimenText = ""
+                                it.foodName = ""
                             } else {
-                                loggedFoodText = loggedFood.toString()
-                                selectedFood = Food( name ="", description = "", calories = 0 )
-                                inFoodName = loggedFood.foodName
-
+                                //We have selected an existing Entry
+                                specimenText = it.toString()
+                                selectedFood = Food(name = "", description = "", calories = 0)
+                                inFoodName = it.foodName
                             }
-                            viewModel.selectedFoodAmount = loggedFood
-                            viewModel.fetchPhotos()
-
+                            viewModel.selectedFoodAmount = it
                         }) {
-                            Text(text = loggedFood.toString())
+                            Text(text = it.toString())
                         }
                     }
                 }
             }
+        }
+    }
+
+    @Composable
+    fun CircleProgressBar(
+        percentage: Float,
+        number: Int,
+        fontSize: TextUnit = 40.sp,
+        radius: Dp = 80.dp,
+        animDuration: Int = 2000,
+        animDelay: Int = 0
+    ) {
+        var animationPlayed by remember {
+            mutableStateOf(false)
+        }
+        val curPercentage = animateFloatAsState(
+            targetValue = if (animationPlayed) percentage else 0f,
+            animationSpec = tween(
+                durationMillis = animDuration,
+                delayMillis = animDelay
+            )
+        )
+        LaunchedEffect(key1 = true) {
+            animationPlayed = true
+        }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.size(radius * 2f)
+        ) {
+            Canvas(modifier = Modifier.size(radius * 2f)) {
+                drawArc(
+                    color = Color.LightGray,
+                    -90f,
+                    360 * curPercentage.value,
+                    useCenter = false,
+                    style = Stroke(width = 20f, cap = StrokeCap.Round)
+                )
+            }
+            Text(
+                text = (curPercentage.value * number).toInt().toString(),
+                color = Color.DarkGray,
+                fontSize = fontSize,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
