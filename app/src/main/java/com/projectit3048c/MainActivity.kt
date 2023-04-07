@@ -1,12 +1,15 @@
 package com.projectit3048c
 
 import android.Manifest
+import android.app.DatePickerDialog
+import android.app.Dialog
 import android.content.ContentValues.TAG
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,7 +34,9 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
@@ -44,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import coil.compose.AsyncImage
 import com.firebase.ui.auth.AuthUI
@@ -60,7 +66,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainActivity : FragmentActivity(){
+class MainActivity : FragmentActivity(), DateSelected{
     private var uri: Uri? = null
     private lateinit var currentImagePath: String
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
@@ -68,10 +74,12 @@ class MainActivity : FragmentActivity(){
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var inFoodName: String = ""
     private var strUri by mutableStateOf("")
+    //private var viewFormattedDate: String = ""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        //setContentView(R.layout.activity_main)
         setContent {
             viewModel.fetchFoods()
             firebaseUser?.let {
@@ -92,7 +100,6 @@ class MainActivity : FragmentActivity(){
             }
         }
     }
-
 
     @Composable
     fun TextFieldWithDropdownUsage(dataIn: List<Food>, label : String = "", selectedFoodAmount: FoodAmount = FoodAmount()) {
@@ -202,7 +209,7 @@ class MainActivity : FragmentActivity(){
                             } else {
                                 //We have selected an existing Entry
                                 specimenText = it.toString()
-                                selectedFood = Food(name = "", description = "", calories = 0)
+                                selectedFood = Food(name = "", description = "", calories = 0.0f)
                                 inFoodName = it.foodName
                             }
                             viewModel.selectedFoodAmount = it
@@ -210,7 +217,6 @@ class MainActivity : FragmentActivity(){
                             Text(text = it.toString())
                         }
                     }
-
                 }
             }
         }
@@ -273,7 +279,6 @@ class MainActivity : FragmentActivity(){
         val context = LocalContext.current
         Column {
             FoodAmountSpinner(foodAmountList = loggedFoods)
-
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxWidth()
@@ -323,30 +328,41 @@ class MainActivity : FragmentActivity(){
                             Toast.LENGTH_LONG
                         )
                             .show()
-                    }
+                    },
+                    modifier = Modifier
+                        .padding(8.dp)
                 ) {
                     Text(text = "Add")
                 }
                 Button(
                     onClick = {
                         signIn()
-                    }
+                    },
+                    modifier = Modifier
+                        .padding(8.dp)
                 ) {
                     Text(text = "Login")
                 }
                 Button(
                     onClick = {
                         takePhoto()
-                    }
+                    },
+                    modifier = Modifier
+                        .padding(8.dp)
                 ) {
                     Text(text = "Photo")
                 }
                 Button(
                     onClick = {
                         showDatePickerDialog()
-                    }
-                ) {
-                    Text(text = "Display Date Picker")
+                    },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        //.fillMaxWidth(),
+
+                )
+                {
+                    Text(text = "Calendar")
                 }
             }
             Events()
@@ -385,7 +401,7 @@ class MainActivity : FragmentActivity(){
     }
 
     private fun showDatePickerDialog() {
-        val datePickerFragment = DatePickerDialog()
+        val datePickerFragment = DatePickerFragment(this)
         datePickerFragment.show(supportFragmentManager, "datePickerDialog")
     }
 
@@ -557,5 +573,41 @@ class MainActivity : FragmentActivity(){
         }
     }
 
-}
 
+
+    class DatePickerFragment(val dateSelected : DateSelected) : DialogFragment(), DatePickerDialog.OnDateSetListener{
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+
+        val calendar : Calendar = Calendar.getInstance();
+        val year = calendar.get(Calendar.YEAR);
+        val month = calendar.get(Calendar.MONTH);
+        val day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        return DatePickerDialog(requireContext(), this, year, month, day)
+        //return super.onCreateDialog(savedInstanceState)
+        }
+
+        override fun onDateSet(p0: DatePicker?, year: Int, month: Int, day: Int) {
+            dateSelected.receiveDate(year, month, day)
+        }
+    }
+
+    override fun receiveDate(year: Int, month: Int, day: Int): String {
+
+        val calendar = GregorianCalendar()
+
+        calendar.set(Calendar.DAY_OF_MONTH, day)
+        calendar.set(Calendar.MONTH, month)
+        calendar.set(Calendar.YEAR, year)
+
+        val viewFormatter = SimpleDateFormat("dd-MMM-YYYY")
+        var viewFormattedDate: String = viewFormatter.format(calendar.getTime())
+
+        // viewModel.foodDate.save()
+        return viewFormattedDate
+        //btnDate.setText(viewFormattedDate)
+    }
+}
+interface DateSelected{
+    fun receiveDate(year: Int, month: Int, day: Int): String
+}
