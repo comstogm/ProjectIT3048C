@@ -211,7 +211,8 @@ class MainActivity : ComponentActivity() {
                                 inFoodName = it.foodName
                             }
                             viewModel.selectedFoodAmount = it
-                            viewModel.fetchPhotos()
+                            //Leaving line 215 commented out ot prevent app crash
+                            //viewModel.fetchPhotos()
                         }) {
                             Text(text = it.toString())
                         }
