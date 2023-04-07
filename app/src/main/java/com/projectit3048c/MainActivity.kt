@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
@@ -30,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
@@ -46,16 +44,14 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.fragment.app.FragmentActivity
 import coil.compose.AsyncImage
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.projectit3048c.dto.Food
-import com.projectit3048c.dto.FoodAmount
-import com.projectit3048c.dto.Photo
-import com.projectit3048c.dto.User
+import com.projectit3048c.dto.*
 import com.projectit3048c.ss23.R
 import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -64,7 +60,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity(){
     private var uri: Uri? = null
     private lateinit var currentImagePath: String
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
@@ -75,6 +71,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             viewModel.fetchFoods()
             firebaseUser?.let {
@@ -95,6 +92,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 
     @Composable
     fun TextFieldWithDropdownUsage(dataIn: List<Food>, label : String = "", selectedFoodAmount: FoodAmount = FoodAmount()) {
@@ -275,6 +273,7 @@ class MainActivity : ComponentActivity() {
         val context = LocalContext.current
         Column {
             FoodAmountSpinner(foodAmountList = loggedFoods)
+
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxWidth()
@@ -342,6 +341,13 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Text(text = "Photo")
                 }
+                Button(
+                    onClick = {
+                        showDatePickerDialog()
+                    }
+                ) {
+                    Text(text = "Display Date Picker")
+                }
             }
             Events()
         }
@@ -376,6 +382,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun showDatePickerDialog() {
+        val datePickerFragment = DatePickerDialog()
+        datePickerFragment.show(supportFragmentManager, "datePickerDialog")
     }
 
     @Composable
@@ -545,5 +556,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 }
 
