@@ -426,9 +426,26 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(end = 8.dp)
                     )
                 }
+                Button (
+                    onClick = {
+                        delete(photo)
+                    }
+                ){
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = "Delete",
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
+            }
             }
         }
+
+    private fun delete(photo: Photo) {
+        viewModel.delete(photo)
+
     }
+
 
     private fun save(photo: Photo) {
         viewModel.updatePhotoDatabase(photo)
