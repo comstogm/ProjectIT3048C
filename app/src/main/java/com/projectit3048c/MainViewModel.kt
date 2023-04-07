@@ -173,7 +173,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     fun delete(photo: Photo) {
         user?.let {
             user ->
-            var photoCollection = firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos").document()
+            var photoCollection = firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos")
             photoCollection.document(photo.id).delete()
             val uri = Uri.parse(photo.localUri)
             val imageRef = storageReference.child("images/${user.uid}/${uri.lastPathSegment}")
