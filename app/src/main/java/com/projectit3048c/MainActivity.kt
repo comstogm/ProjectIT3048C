@@ -100,6 +100,7 @@ class MainActivity : FragmentActivity(){
         val dropDownOptions = remember { mutableStateOf(listOf<Food>()) }
         val textFieldValue = remember(selectedFoodAmount.foodId) { mutableStateOf(TextFieldValue(selectedFoodAmount.foodName)) }
         val dropDownExpanded = remember { mutableStateOf(false) }
+
         fun onDropdownDismissRequest() {
             dropDownExpanded.value = false
         }
@@ -112,6 +113,7 @@ class MainActivity : FragmentActivity(){
                 it.toString().startsWith(value.text) && it.toString() != value.text
             }.take(3)
         }
+
         TextFieldWithDropdown(
             modifier = Modifier.fillMaxWidth(),
             value = textFieldValue.value,
@@ -122,7 +124,6 @@ class MainActivity : FragmentActivity(){
             label = label
         )
     }
-
 
     @Composable
     fun TextFieldWithDropdown(
@@ -170,6 +171,92 @@ class MainActivity : FragmentActivity(){
                     }
                 }
             }
+        }
+    }
+
+    @Composable
+    fun FoodAmountSpinner(foodAmountList: List<FoodAmount>) {
+        var specimenText by remember { mutableStateOf("Logged Foods") }
+        var expanded by remember { mutableStateOf(false) }
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Row(Modifier
+                .padding(24.dp)
+                .clickable {
+                    expanded = !expanded
+                }
+                .padding(8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = specimenText, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
+                Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "")
+                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                    foodAmountList.forEach {
+                        DropdownMenuItem(onClick = {
+                            expanded = false
+
+                            if (it.foodName == viewModel.NEW_FOODAMOUNT) {
+                                //We have a new Entry
+                                specimenText = ""
+                                it.foodName = ""
+                            } else {
+                                //We have selected an existing Entry
+                                specimenText = it.toString()
+                                selectedFood = Food(name = "", description = "", calories = 0)
+                                inFoodName = it.foodName
+                            }
+                            viewModel.selectedFoodAmount = it
+                        }) {
+                            Text(text = it.toString())
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun CircleProgressBar(
+        percentage: Float,
+        number: Int,
+        fontSize: TextUnit = 40.sp,
+        radius: Dp = 80.dp,
+        animDuration: Int = 2000,
+        animDelay: Int = 0
+    ) {
+        var animationPlayed by remember {
+            mutableStateOf(false)
+        }
+        val curPercentage = animateFloatAsState(
+            targetValue = if (animationPlayed) percentage else 0f,
+            animationSpec = tween(
+                durationMillis = animDuration,
+                delayMillis = animDelay
+            )
+        )
+        LaunchedEffect(key1 = true) {
+            animationPlayed = true
+        }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.size(radius * 2f)
+        ) {
+            Canvas(modifier = Modifier.size(radius * 2f)) {
+                drawArc(
+                    color = Color.LightGray,
+                    -90f,
+                    360 * curPercentage.value,
+                    useCenter = false,
+                    style = Stroke(width = 20f, cap = StrokeCap.Round)
+                )
+            }
+            Text(
+                text = (curPercentage.value * number).toInt().toString(),
+                color = Color.DarkGray,
+                fontSize = fontSize,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 
@@ -270,7 +357,7 @@ class MainActivity : FragmentActivity(){
         }
 
         @Composable
-        fun EventListItem(foodAmounts: FoodAmount) {
+        fun EventListItem2(foodAmounts: FoodAmount) {
             Row {
                 Column(Modifier.weight(6f)) {
                     Text(text = foodAmounts.foodId, style = typography.h6)
@@ -470,89 +557,5 @@ class MainActivity : FragmentActivity(){
         }
     }
 
-    @Composable
-    fun FoodAmountSpinner(foodAmountList: List<FoodAmount>) {
-        var specimenText by remember { mutableStateOf("Logged Foods") }
-        var expanded by remember { mutableStateOf(false) }
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            Row(Modifier
-                .padding(24.dp)
-                .clickable {
-                    expanded = !expanded
-                }
-                .padding(8.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = specimenText, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
-                Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "")
-                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    foodAmountList.forEach {
-                        DropdownMenuItem(onClick = {
-                            expanded = false
-
-                            if (it.foodName == viewModel.NEW_FOODAMOUNT) {
-                                //We have a new Entry
-                                specimenText = ""
-                                it.foodName = ""
-                            } else {
-                                //We have selected an existing Entry
-                                specimenText = it.toString()
-                                selectedFood = Food(name = "", description = "", calories = 0)
-                                inFoodName = it.foodName
-                            }
-                            viewModel.selectedFoodAmount = it
-                        }) {
-                            Text(text = it.toString())
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun CircleProgressBar(
-        percentage: Float,
-        number: Int,
-        fontSize: TextUnit = 40.sp,
-        radius: Dp = 80.dp,
-        animDuration: Int = 2000,
-        animDelay: Int = 0
-    ) {
-        var animationPlayed by remember {
-            mutableStateOf(false)
-        }
-        val curPercentage = animateFloatAsState(
-            targetValue = if (animationPlayed) percentage else 0f,
-            animationSpec = tween(
-                durationMillis = animDuration,
-                delayMillis = animDelay
-            )
-        )
-        LaunchedEffect(key1 = true) {
-            animationPlayed = true
-        }
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.size(radius * 2f)
-        ) {
-            Canvas(modifier = Modifier.size(radius * 2f)) {
-                drawArc(
-                    color = Color.LightGray,
-                    -90f,
-                    360 * curPercentage.value,
-                    useCenter = false,
-                    style = Stroke(width = 20f, cap = StrokeCap.Round)
-                )
-            }
-            Text(
-                text = (curPercentage.value * number).toInt().toString(),
-                color = Color.DarkGray,
-                fontSize = fontSize,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
 }
 
