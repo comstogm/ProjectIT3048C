@@ -3,6 +3,16 @@
     <string name="foodName">Food Name</string>
     <string name="foodIntake">Breakfast</string>
     <string name="foodAmount">Amount</string>
-    <string name="foodLoged">Date</string>
+    <string name="foodLogged">Date</string>
     <string name="intake">Intake</string>
+    <string name="os_name">Android</string>
+    <string name="add_button">Add</string>
+    <string name="login_button">Login</string>
+    <string name="photo_button">Photo</string>
+    <string name="delete_button">Delete</string>
+    <string name="photo_description">Event Image</string>
+    <string name="description">Description</string>
+    <string name="save_button">Save</string>
+    <string name="camera_error">Unable to load camera without permission</string>
+    <string name="login_error">Error logging in</string>
 </resources>

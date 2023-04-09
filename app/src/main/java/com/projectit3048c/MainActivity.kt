@@ -90,7 +90,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colors.background
                 ) {
-                    CalorieFacts("Android", foods, foodAmounts, viewModel.selectedFoodAmount)
+                    CalorieFacts(getString(R.string.os_name), foods, foodAmounts, viewModel.selectedFoodAmount)
                 }
             }
         }
@@ -295,7 +295,7 @@ class MainActivity : ComponentActivity() {
             OutlinedTextField(
                 value = inDate,
                 onValueChange = { inDate = it },
-                label = { Text(stringResource(R.string.foodLoged)) },
+                label = { Text(stringResource(R.string.foodLogged)) },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
@@ -326,21 +326,21 @@ class MainActivity : ComponentActivity() {
                             .show()
                     }
                 ) {
-                    Text(text = "Add")
+                    Text(text = stringResource(R.string.add_button))
                 }
                 Button(
                     onClick = {
                         signIn()
                     }
                 ) {
-                    Text(text = "Login")
+                    Text(text = stringResource(R.string.login_button))
                 }
                 Button(
                     onClick = {
                         takePhoto()
                     }
                 ) {
-                    Text(text = "Photo")
+                    Text(text = stringResource(R.string.photo_button))
                 }
             }
             Events()
@@ -363,7 +363,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Delete,
-                            contentDescription = "Delete"
+                            contentDescription = stringResource(R.string.delete_button)
                         )
                     }
                 }
@@ -372,7 +372,7 @@ class MainActivity : ComponentActivity() {
                         signIn()
                     }
                 ) {
-                    Text(text = "Logon")
+                    Text(text = stringResource(R.string.login_button))
                 }
             }
         }
@@ -396,7 +396,7 @@ class MainActivity : ComponentActivity() {
         var inDescription by remember(photo.id) {mutableStateOf(photo.description)}
         Row{
             Column(Modifier.weight(2f)) {
-                AsyncImage(model = photo.localUri, contentDescription = "Event Image",
+                AsyncImage(model = photo.localUri, contentDescription = stringResource(R.string.photo_description),
                     Modifier
                         .width(64.dp)
                         .height(64.dp))
@@ -407,8 +407,7 @@ class MainActivity : ComponentActivity() {
                 OutlinedTextField(
                     value = inDescription,
                     onValueChange = {inDescription = it},
-                   // label = { Text(stringResource(R.string.description))},
-                    label = { Text("Description")},
+                    label = { Text(stringResource(R.string.description))},
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -421,7 +420,7 @@ class MainActivity : ComponentActivity() {
                         ){
                     Icon(
                         imageVector = Icons.Filled.Check,
-                        contentDescription = "Save",
+                        contentDescription = stringResource(R.string.save_button),
                         modifier = Modifier.padding(end = 8.dp)
                     )
                 }
@@ -458,7 +457,7 @@ class MainActivity : ComponentActivity() {
         if (permissionGranted) {
             invokeCamera()
         } else {
-            Toast.makeText(this, "Unable to load camera without permission.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.camera_error), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -529,7 +528,7 @@ class MainActivity : ComponentActivity() {
                 viewModel.listenToFoodSpecimens()
             }
         } else {
-            Log.e("MainActivity.ky", "Error logging in" + response?.error?.errorCode)
+            Log.e("MainActivity.ky", getString(R.string.login_error) + response?.error?.errorCode)
         }
     }
 
@@ -541,7 +540,7 @@ class MainActivity : ComponentActivity() {
                 color = MaterialTheme.colors.background,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                CalorieFacts("Android")
+                CalorieFacts(stringResource(R.string.os_name))
             }
         }
     }
