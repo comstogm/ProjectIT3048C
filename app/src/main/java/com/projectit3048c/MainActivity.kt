@@ -19,8 +19,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
+import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
@@ -214,6 +216,8 @@ class MainActivity : FragmentActivity(){
                                 inFoodName = it.foodName
                             }
                             viewModel.selectedFoodAmount = it
+                            //Leaving line 215 commented out ot prevent app crash
+                            //viewModel.fetchPhotos()
                         }) {
                             Text(text = it.toString())
                         }
@@ -451,40 +455,71 @@ class MainActivity : FragmentActivity(){
     @Composable
     fun EventListItem(photo: Photo){
         var inDescription by remember(photo.id) {mutableStateOf(photo.description)}
-        Row{
-            Column(Modifier.weight(2f)) {
-                AsyncImage(model = photo.localUri, contentDescription = "Event Image",
-                    Modifier
-                        .width(64.dp)
-                        .height(64.dp))
-            }
-            Column(Modifier.weight(4f)) {
-                Text(text = photo.id, style = typography.h6)
-                Text(text = photo.dateTaken.toString(), style = typography.caption)
-                OutlinedTextField(
-                    value = inDescription,
-                    onValueChange = {inDescription = it},
-                   // label = { Text(stringResource(R.string.description))},
-                    label = { Text("Description")},
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            Column(Modifier.weight(1f)) {
-                Button (
-                    onClick = {
-                        photo.description = inDescription
-                        save(photo)
-                    }
-                        ){
-                    Icon(
-                        imageVector = Icons.Filled.Check,
-                        contentDescription = "Save",
-                        modifier = Modifier.padding(end = 8.dp)
+        Card(
+            modifier = Modifier
+                .padding(horizontal = 4.dp, vertical = 4.dp)
+                .fillMaxWidth(),
+            elevation = 8.dp,
+            backgroundColor = MaterialTheme.colors.background,
+            contentColor = contentColorFor(backgroundColor),
+            shape = RoundedCornerShape(20.dp),
+            border = BorderStroke(1.dp, Color.Black)
+        )
+        {
+            Row {
+                Column(Modifier.weight(2f)) {
+                    AsyncImage(
+                        model = photo.localUri, contentDescription = "Event Image",
+                        Modifier
+                            .width(64.dp)
+                            .height(64.dp)
                     )
+                }
+                Column(Modifier.weight(4f)) {
+                    Text(text = photo.id, style = typography.h6)
+                    Text(text = photo.dateTaken.toString(), style = typography.caption)
+                    OutlinedTextField(
+                        value = inDescription,
+                        onValueChange = { inDescription = it },
+                        // label = { Text(stringResource(R.string.description))},
+                        label = { Text("Description") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                Column(Modifier.weight(1f)) {
+                    Button(
+                        onClick = {
+                            photo.description = inDescription
+                            save(photo)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = "Save",
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            delete(photo)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = "Delete",
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                    }
                 }
             }
         }
+        }
+
+    private fun delete(photo: Photo) {
+        viewModel.delete(photo)
+
     }
+
 
     private fun save(photo: Photo) {
         viewModel.updatePhotoDatabase(photo)
