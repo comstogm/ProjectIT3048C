@@ -15,6 +15,9 @@ data class FoodAmount(var foodId: String = "", //firebase identifier
                       var foodIntake: String = "",
                       var foodAmount: String = "",
                       var foodDate: String = "") {
+    init {
+        if (internalFoodID < 0) throw IllegalArgumentException("Internal food ID must be greater than or equal to 0.")
+    }
 
     /**
      * Returns a string of food and its intake amount

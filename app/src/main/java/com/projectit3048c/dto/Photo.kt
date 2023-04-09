@@ -1,5 +1,6 @@
 package com.projectit3048c.dto
 
+import android.net.Uri
 import java.util.*
 
 /**
@@ -16,4 +17,21 @@ data class Photo(var localUri: String = "",
                  var description: String = "",
                  var dateTaken: Date = Date(),
                  var id: String = "") {
+    init {
+        if (!isValidUri(localUri)) {
+            throw IllegalArgumentException("Invalid local URI: $localUri")
+        }
+        if (!isValidUri(remoteUri)) {
+            throw IllegalArgumentException("Invalid remote URI: $remoteUri")
+        }
+    }
+
+    private fun isValidUri(uriString: String): Boolean {
+        return try {
+            Uri.parse(uriString)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
 }

@@ -7,4 +7,9 @@ package com.projectit3048c.dto
  * @property displayName Display name of the user
  */
 data class User(val uid: String = "", var displayName: String?) {
+    init {
+        if (uid.isBlank()) {
+            throw IllegalArgumentException("ID cannot be empty")
+        }
+    }
 }
