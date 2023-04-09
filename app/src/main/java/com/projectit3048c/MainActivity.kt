@@ -8,13 +8,13 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -33,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
@@ -49,25 +48,31 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.fragment.app.FragmentActivity
 import coil.compose.AsyncImage
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.projectit3048c.dto.Food
-import com.projectit3048c.dto.FoodAmount
-import com.projectit3048c.dto.Photo
-import com.projectit3048c.dto.User
+import com.projectit3048c.dto.*
 import com.projectit3048c.ss23.R
+import com.projectit3048c.ss23.ui.theme.Orange
 import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
+import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity(){
+
     private var uri: Uri? = null
     private lateinit var currentImagePath: String
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
@@ -207,7 +212,7 @@ class MainActivity : ComponentActivity() {
                             } else {
                                 //We have selected an existing Entry
                                 specimenText = it.toString()
-                                selectedFood = Food(name = "", description = "", calories = 0)
+                                selectedFood = Food(name = "", description = "", calories = 0.0f)
                                 inFoodName = it.foodName
                             }
                             viewModel.selectedFoodAmount = it
@@ -217,7 +222,6 @@ class MainActivity : ComponentActivity() {
                             Text(text = it.toString())
                         }
                     }
-
                 }
             }
         }
@@ -249,7 +253,8 @@ class MainActivity : ComponentActivity() {
             contentAlignment = Alignment.Center,
             modifier = Modifier.size(radius * 2f)
         ) {
-            Canvas(modifier = Modifier.size(radius * 2f)) {
+            Canvas(modifier = Modifier.size(radius * 2f)
+            ) {
                 drawArc(
                     color = Color.LightGray,
                     -90f,
@@ -269,14 +274,22 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun CalorieFacts(
-        name: String,
+        selectedDate: String,
         foods: List<Food> = ArrayList<Food>(),
         loggedFoods: List<FoodAmount> = ArrayList<FoodAmount>(),
         selectedFoodAmount: FoodAmount = FoodAmount(),
     ) {
         var inIntake by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodIntake) }
-        var inDate by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodDate) }
         var inAmount by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodAmount) }
+        var pickedDate by remember { mutableStateOf(LocalDate.now()) }
+        val formattedDate by remember {
+            derivedStateOf {
+                DateTimeFormatter.ofPattern("MMM dd YYYY")
+                    .format(pickedDate)
+            }
+        }
+        val dateDialogState = rememberMaterialDialogState()
+
         val context = LocalContext.current
         Column {
             FoodAmountSpinner(foodAmountList = loggedFoods)
@@ -286,6 +299,51 @@ class MainActivity : ComponentActivity() {
             ){
                 CircleProgressBar(percentage = 0.8f, number = 100)
             }
+            Spacer(modifier = Modifier.height(50.dp))
+            //Date
+                Button(
+                    onClick = {
+                        dateDialogState.show()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        contentColor = Color.DarkGray
+                    ),
+                    modifier = Modifier
+                        .border(
+                            BorderStroke(width = 2.dp, color = Color.LightGray),
+                            //shape = RoundedCornerShape(16.dp),
+                        )
+                        .height(50.dp)
+                        //.width(300.dp)
+                        //.wrapContentWidth()
+                        .fillMaxWidth()
+                )
+                {
+                    Text(text = formattedDate)
+                }
+            //Spacer(modifier = Modifier.height(50.dp))
+                MaterialDialog(
+                    dialogState = dateDialogState,
+                    buttons = {
+                        positiveButton(text = "Ok") {
+                            Toast.makeText(
+                                applicationContext,
+                                "CLicked ok",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                        negativeButton(text = "Cancel")
+                    }
+                ) {
+                    datepicker(
+                        initialDate = LocalDate.now(),
+                        title = "Pick a date",
+                        colors = DatePickerDefaults.colors(Orange),
+                    ) {
+                        pickedDate = it
+                    }
+                }
             TextFieldWithDropdownUsage(
                 dataIn = foods,
                 label = stringResource(R.string.foodName),
@@ -298,18 +356,11 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
-                value = inDate,
-                onValueChange = { inDate = it },
-                label = { Text(stringResource(R.string.foodLoged)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
                 value = inAmount,
                 onValueChange = { inAmount = it },
                 label = { Text(stringResource(R.string.foodAmount)) },
                 modifier = Modifier.fillMaxWidth()
             )
-
             Row(modifier = Modifier.padding(all = 2.dp)) {
                 Button(
                     onClick = {
@@ -320,30 +371,35 @@ class MainActivity : ComponentActivity() {
                             } ?: 0
                             foodAmount = inAmount
                             foodIntake = inIntake
-                            foodDate = inDate
+                            foodDate = pickedDate.toString()
                         }
                         viewModel.saveFoodAmount()
                         Toast.makeText(
                             context,
-                            "$inFoodName $inAmount $inIntake $inDate",
+                            "$inFoodName $inAmount $inIntake $pickedDate",
                             Toast.LENGTH_LONG
-                        )
-                            .show()
-                    }
+                        ).show()
+                    },
+                    modifier = Modifier
+                        .padding(8.dp)
                 ) {
                     Text(text = "Add")
                 }
                 Button(
                     onClick = {
                         signIn()
-                    }
+                    },
+                    modifier = Modifier
+                        .padding(8.dp)
                 ) {
                     Text(text = "Login")
                 }
                 Button(
                     onClick = {
                         takePhoto()
-                    }
+                    },
+                    modifier = Modifier
+                        .padding(8.dp)
                 ) {
                     Text(text = "Photo")
                 }
@@ -582,4 +638,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-

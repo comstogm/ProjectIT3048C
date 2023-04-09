@@ -149,7 +149,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     }
 
     fun fetchPhotos() {
-        photos.clear()
+        //photos.clear()
         user?.let {
             user ->
             var photoCollection = firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos")
@@ -158,13 +158,19 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
                 querySnapshot?.let {
                     querySnapshot ->
                     var documents = querySnapshot.documents
+
+                    var inPhotos = ArrayList<Photo>()
+
+
                     documents?.forEach {
                         var photo = it.toObject(Photo::class.java)
                         photo?.let {
-                            photo ->
-                            photos.add(photo)
+                            //photo ->
+                            //photos.add(photo)
+                            inPhotos.add(it)
                         }
                     }
+                    eventPhotos.value = inPhotos
                 }
             }
         }
