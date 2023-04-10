@@ -349,6 +349,7 @@ class MainActivity : FragmentActivity(){
                         colors = DatePickerDefaults.colors(Orange),
                     ) {
                         pickedDate = it
+                        viewModel.selectedDate = it
                     }
                 }
             TextFieldWithDropdownUsage(

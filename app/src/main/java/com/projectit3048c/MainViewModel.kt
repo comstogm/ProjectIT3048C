@@ -19,6 +19,7 @@ import com.projectit3048c.dto.User
 import kotlinx.coroutines.launch
 import com.projectit3048c.service.FoodService
 import com.projectit3048c.service.IFoodService
+import java.time.LocalDate
 
 class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel() {
     val photos: ArrayList<Photo> by mutableStateOf(ArrayList<Photo>())
@@ -28,6 +29,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     val NEW_FOODAMOUNT = "New Food"
     var user: User? = null
     val eventPhotos : MutableLiveData<List<Photo>> = MutableLiveData<List<Photo>>()
+    var selectedDate by mutableStateOf(LocalDate.now())
 
 
     private lateinit var firestore : FirebaseFirestore
