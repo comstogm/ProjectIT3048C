@@ -274,10 +274,17 @@ class MainActivity : FragmentActivity(){
         foods: List<Food> = ArrayList<Food>(),
         loggedFoods: List<FoodAmount> = ArrayList<FoodAmount>(),
         selectedFoodAmount: FoodAmount = FoodAmount(),
+
+        selectedFood: Food = Food(),
     ) {
         var inIntake by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodIntake) }
         var inAmount by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodAmount) }
         var pickedDate by remember { mutableStateOf(LocalDate.now()) }
+
+        var inCalories by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodCkalories) }
+        val calories2 by remember(selectedFood.id) { mutableStateOf(selectedFood.calories) }
+
+
         val formattedDate by remember {
             derivedStateOf {
                 DateTimeFormatter.ofPattern("MMM dd YYYY")
@@ -293,7 +300,7 @@ class MainActivity : FragmentActivity(){
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxWidth()
             ){
-                CircleProgressBar(percentage = 0.8f, number = 100)
+                CircleProgressBar(calories2, number = 1000)
             }
             Spacer(modifier = Modifier.height(50.dp))
             //Date
