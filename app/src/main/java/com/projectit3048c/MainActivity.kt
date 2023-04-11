@@ -10,12 +10,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Canvas
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -56,6 +53,7 @@ import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.projectit3048c.dto.*
+import com.projectit3048c.service.FoodService
 import com.projectit3048c.ss23.R
 import com.projectit3048c.ss23.ui.theme.Orange
 import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
@@ -79,6 +77,8 @@ class MainActivity : FragmentActivity(){
     private var selectedFood: Food? = null
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var inFoodName: String = ""
+    private var inCkalories: String = ""
+    private var totalCal : Int = 0
     private var strUri by mutableStateOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -125,7 +125,7 @@ class MainActivity : FragmentActivity(){
         }
 
         TextFieldWithDropdown(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.width(300.dp),
             value = textFieldValue.value,
             setValue = ::onValueChanged,
             onDismissRequest = ::onDropdownDismissRequest,
@@ -148,7 +148,7 @@ class MainActivity : FragmentActivity(){
         Box(modifier) {
             TextField(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .width(300.dp)
                     .onFocusChanged { focusState ->
                         if (!focusState.isFocused)
                             onDismissRequest()
@@ -204,20 +204,20 @@ class MainActivity : FragmentActivity(){
                     foodAmountList.forEach {
                         DropdownMenuItem(onClick = {
                             expanded = false
-
                             if (it.foodName == viewModel.NEW_FOODAMOUNT) {
                                 //We have a new Entry
                                 specimenText = ""
                                 it.foodName = ""
+                                it.foodCkalories = 0
                             } else {
                                 //We have selected an existing Entry
-                                specimenText = it.toString()
-                                selectedFood = Food(name = "", description = "", calories = 0.0f)
+                                selectedFood = Food(name = "", description = "", calories = "")
                                 inFoodName = it.foodName
+                                inCkalories = it.foodCkalories.toString()
+                                totalCal += it.foodCkalories
                             }
                             viewModel.selectedFoodAmount = it
-                            //Leaving line 215 commented out ot prevent app crash
-                            //viewModel.fetchPhotos()
+                            viewModel.fetchPhotos()
                         }) {
                             Text(text = it.toString())
                         }
@@ -231,9 +231,10 @@ class MainActivity : FragmentActivity(){
     fun CircleProgressBar(
         percentage: Float,
         number: Int,
-        fontSize: TextUnit = 40.sp,
+        fontSize: TextUnit = 20.sp,
+        //fontSize2: TextUnit = 20.sp,
         radius: Dp = 80.dp,
-        animDuration: Int = 2000,
+        animDuration: Int = 1000,
         animDelay: Int = 0
     ) {
         var animationPlayed by remember {
@@ -258,13 +259,13 @@ class MainActivity : FragmentActivity(){
                 drawArc(
                     color = Color.LightGray,
                     -90f,
-                    360 * curPercentage.value,
+                    360 * curPercentage.value/2400,
                     useCenter = false,
                     style = Stroke(width = 20f, cap = StrokeCap.Round)
                 )
             }
             Text(
-                text = (curPercentage.value * number).toInt().toString(),
+                text = (curPercentage.value).toInt().toString()+"/"+(2400-curPercentage.value).toInt().toString(),
                 color = Color.DarkGray,
                 fontSize = fontSize,
                 fontWeight = FontWeight.Bold
@@ -274,40 +275,20 @@ class MainActivity : FragmentActivity(){
 
     @Composable
     fun CalorieFacts(
-        selectedDate: String,
+        name: String,
         foods: List<Food> = ArrayList<Food>(),
         loggedFoods: List<FoodAmount> = ArrayList<FoodAmount>(),
         selectedFoodAmount: FoodAmount = FoodAmount(),
-
         selectedFood: Food = Food(),
     ) {
         var inIntake by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodIntake) }
         var inAmount by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodAmount) }
         var pickedDate by remember { mutableStateOf(LocalDate.now()) }
-
-        var inCalories by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodCkalories) }
-        val calories2 by remember(selectedFood.id) { mutableStateOf(selectedFood.calories) }
-
-
-        val formattedDate by remember {
-            derivedStateOf {
-                DateTimeFormatter.ofPattern("MMM dd YYYY")
-                    .format(pickedDate)
-            }
-        }
+        val formattedDate by remember { derivedStateOf { DateTimeFormatter.ofPattern("MMM dd YYYY").format(pickedDate) }}
         val dateDialogState = rememberMaterialDialogState()
-
         val context = LocalContext.current
         Column {
-            FoodAmountSpinner(foodAmountList = loggedFoods)
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxWidth()
-            ){
-                CircleProgressBar(calories2, number = 1000)
-            }
-            Spacer(modifier = Modifier.height(50.dp))
-            //Date
+            //Spacer(modifier = Modifier.height(50.dp))
                 Button(
                     onClick = {
                         dateDialogState.show()
@@ -321,7 +302,7 @@ class MainActivity : FragmentActivity(){
                             BorderStroke(width = 2.dp, color = Color.LightGray),
                             //shape = RoundedCornerShape(16.dp),
                         )
-                        .height(50.dp)
+                        .height(70.dp)
                         //.width(300.dp)
                         //.wrapContentWidth()
                         .fillMaxWidth()
@@ -329,7 +310,6 @@ class MainActivity : FragmentActivity(){
                 {
                     Text(text = formattedDate)
                 }
-            //Spacer(modifier = Modifier.height(50.dp))
                 MaterialDialog(
                     dialogState = dateDialogState,
                     buttons = {
@@ -351,11 +331,26 @@ class MainActivity : FragmentActivity(){
                         pickedDate = it
                     }
                 }
-            TextFieldWithDropdownUsage(
-                dataIn = foods,
-                label = stringResource(R.string.foodName),
-                selectedFoodAmount = selectedFoodAmount
-            )
+            FoodAmountSpinner(foodAmountList = loggedFoods)
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxWidth()
+            ){
+                val floatTotalCkal = totalCal.toFloat()
+                CircleProgressBar(floatTotalCkal, number = 1)
+            }
+            Row(modifier = Modifier.padding(all = 2.dp)) {
+                TextFieldWithDropdownUsage(
+                    dataIn = foods,
+                    label = stringResource(R.string.foodName),
+                    selectedFoodAmount = selectedFoodAmount
+                )
+                TextField(value = inCkalories + " ckal",
+                    onValueChange = { inCkalories = it },
+                    colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.White
+                ))
+            }
             OutlinedTextField(
                 value = inIntake,
                 onValueChange = { inIntake = it },
@@ -379,6 +374,11 @@ class MainActivity : FragmentActivity(){
                             foodAmount = inAmount
                             foodIntake = inIntake
                             foodDate = pickedDate.toString()
+                            for (food in foods) {
+                                if (food.name.contains(foodName)) {
+                                    foodCkalories = food.calories.toInt()
+                                }
+                            }
                         }
                         viewModel.saveFoodAmount()
                         Toast.makeText(
@@ -496,7 +496,7 @@ class MainActivity : FragmentActivity(){
                 Column(Modifier.weight(1f)) {
                     Button(
                         onClick = {
-                            photo.description = inDescription
+                            //photo.description = inDescription
                             save(photo)
                         }
                     ) {
@@ -520,7 +520,7 @@ class MainActivity : FragmentActivity(){
                 }
             }
         }
-        }
+    }
 
     private fun delete(photo: Photo) {
         viewModel.delete(photo)

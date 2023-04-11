@@ -12,10 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.storage.FirebaseStorage
-import com.projectit3048c.dto.Food
-import com.projectit3048c.dto.FoodAmount
-import com.projectit3048c.dto.Photo
-import com.projectit3048c.dto.User
+import com.projectit3048c.dto.*
 import kotlinx.coroutines.launch
 import com.projectit3048c.service.FoodService
 import com.projectit3048c.service.IFoodService
@@ -158,16 +155,13 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
                 querySnapshot?.let {
                     querySnapshot ->
                     var documents = querySnapshot.documents
-
                     var inPhotos = ArrayList<Photo>()
-
-
                     documents?.forEach {
                         var photo = it.toObject(Photo::class.java)
                         photo?.let {
                             //photo ->
-                            //photos.add(photo)
-                            inPhotos.add(it)
+                            //photos.add(it)
+                         inPhotos.add(it)
                         }
                     }
                     eventPhotos.value = inPhotos
