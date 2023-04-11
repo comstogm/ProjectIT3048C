@@ -2,8 +2,37 @@ package com.projectit3048c.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class Food(var id: Int=0, var name: String="", var description: String="", var calories: Float = 0.0f) {
+data class Food(var id: Int=0, var name: String="", var description: String="", var calories: String="") {
     override fun toString(): String {
-        return "$name $description"
+        return "$name"
     }
+    
+
+
+//    companion object {
+//        fun getCal(): String {
+//            return "$calories"
+//        }
+//    }
 }
+
+//    fun getCal (calories: String): Float {
+//        return calories.toFloat()
+//    }
+
+
+
+//    fun toFloat(): Float {
+//        var total = 0F
+//        calories.forEach { total += it.consumedCalories }
+//        return total
+//    }
+//    companion object {
+//        fun toFloat(calories: String): Float {
+//            return calories.toFloat()
+//        }
+//    }
+
+
+
+
