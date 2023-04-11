@@ -81,7 +81,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
             user ->
             val document = if (selectedFoodAmount.foodId == null || selectedFoodAmount.foodId.isEmpty()) {
                 //create new FoodAmount
-                firestore.collection("users").document(user.uid).collection("specimens").document()
+                firestore.collection("users").document(user.uid).collection("dates").document(selectedDate.toString()).collection("specimens").document()
             } else {
                 //update existing FoodAmount
                 firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId)
