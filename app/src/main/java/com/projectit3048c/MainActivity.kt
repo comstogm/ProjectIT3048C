@@ -350,6 +350,7 @@ class MainActivity : FragmentActivity(){
                     ) {
                         pickedDate = it
                         viewModel.selectedDate = it
+                        viewModel.listenToFoodSpecimens()
                     }
                 }
             TextFieldWithDropdownUsage(
