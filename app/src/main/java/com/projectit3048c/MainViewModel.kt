@@ -16,6 +16,7 @@ import com.projectit3048c.dto.*
 import kotlinx.coroutines.launch
 import com.projectit3048c.service.FoodService
 import com.projectit3048c.service.IFoodService
+import java.time.LocalDate
 
 class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel() {
     val photos: ArrayList<Photo> by mutableStateOf(ArrayList<Photo>())
@@ -25,6 +26,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     val NEW_FOODAMOUNT = "New Food"
     var user: User? = null
     val eventPhotos : MutableLiveData<List<Photo>> = MutableLiveData<List<Photo>>()
+    var selectedDate by mutableStateOf(LocalDate.now())
 
 
     private lateinit var firestore : FirebaseFirestore
@@ -37,7 +39,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     fun listenToFoodSpecimens() {
         user?.let{
             user ->
-            firestore.collection("users").document(user.uid).collection("specimens").addSnapshotListener {
+            firestore.collection("users").document(user.uid).collection("dates").document(selectedDate.toString()).collection("specimens").addSnapshotListener {
                     snapshot, e ->
                 //handle error
                 if(e != null) {
@@ -76,10 +78,10 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
             user ->
             val document = if (selectedFoodAmount.foodId == null || selectedFoodAmount.foodId.isEmpty()) {
                 //create new FoodAmount
-                firestore.collection("users").document(user.uid).collection("specimens").document()
+                firestore.collection("users").document(user.uid).collection("dates").document(selectedDate.toString()).collection("specimens").document()
             } else {
                 //update existing FoodAmount
-                firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId)
+                firestore.collection("users").document(user.uid).collection("dates").document(selectedDate.toString()).collection("specimens").document(selectedFoodAmount.foodId)
             }
             selectedFoodAmount.foodId = document.id
             val handle = document.set(selectedFoodAmount)
@@ -120,15 +122,15 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
         user?.let {
             user ->
             var photoDocument = if (photo.id.isEmpty()) {
-                firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos").document()
+                firestore.collection("users").document(user.uid).collection("dates").document(selectedDate.toString()).collection("specimens").document(selectedFoodAmount.foodId).collection("photos").document()
             } else {
-                firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos").document(photo.id)
+                firestore.collection("users").document(user.uid).collection("dates").document(selectedDate.toString()).collection("specimens").document(selectedFoodAmount.foodId).collection("photos").document(photo.id)
             }
             photo.id = photoDocument.id
             var handle = photoDocument.set(photo)
             handle.addOnSuccessListener {
                 Log.i(TAG, "Successfully update photo metadata")
-                //firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos").document(photo.id).set(photo)
+                //firestore.collection("users").document(user.uid).collection("dates").document(selectedDate.toString()).collection("specimens").document(selectedFoodAmount.foodId).collection("photos").document(photo.id).set(photo)
             }
             handle.addOnFailureListener {
                 Log.e(TAG, "Error updating photo data: ${it.message}")
@@ -149,7 +151,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
         //photos.clear()
         user?.let {
             user ->
-            var photoCollection = firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos")
+            var photoCollection = firestore.collection("users").document(user.uid).collection("dates").document(selectedDate.toString()).collection("specimens").document(selectedFoodAmount.foodId).collection("photos")
             var photosListener = photoCollection.addSnapshotListener {
                 querySnapshot, firebaseFirestoreException ->
                 querySnapshot?.let {
@@ -173,7 +175,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     fun delete(photo: Photo) {
         user?.let {
             user ->
-            var photoCollection = firestore.collection("users").document(user.uid).collection("specimens").document(selectedFoodAmount.foodId).collection("photos")
+            var photoCollection = firestore.collection("users").document(user.uid).collection("dates").document(selectedDate.toString()).collection("specimens").document(selectedFoodAmount.foodId).collection("photos")
             photoCollection.document(photo.id).delete()
             val uri = Uri.parse(photo.localUri)
             val imageRef = storageReference.child("images/${user.uid}/${uri.lastPathSegment}")
