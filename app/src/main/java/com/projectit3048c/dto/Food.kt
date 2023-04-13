@@ -6,6 +6,10 @@ data class Food(var id: Int=0, var name: String="", var description: String="", 
     override fun toString(): String {
         return "$name"
     }
+    fun toString2(): String {
+        return "$name $description"
+    }
+
     
 
 
