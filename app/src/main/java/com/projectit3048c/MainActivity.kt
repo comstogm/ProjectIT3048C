@@ -132,23 +132,19 @@ class MainActivity : FragmentActivity(){
                 list = dropDownOptions.value,
                 label = label
             )
-            for (food in dataIn) {
-                if (food.name == inFoodName) {
-                    inCkalories = food.calories
-                    inDescription = food.description
-                }
-            }
             Row {
                 var calString : String = ""
-                if(inCkalories == ""){
-                    calString = inCkalories
-
-                }else{
-                    calString = inCkalories + " Cal"
-                }
-                if(inFoodName == ""){
+                if(inFoodName == "" || inCkalories == "0" ){
                     calString = ""
                     inDescription = ""
+                }else{
+                    for (food in dataIn) {
+                        if (food.name == inFoodName) {
+                            inCkalories = food.calories
+                            inDescription = food.description
+                        }
+                    }
+                    calString = inCkalories + " Cal"
                 }
                 Text(
                     text = inDescription,
@@ -156,13 +152,15 @@ class MainActivity : FragmentActivity(){
                         .width(220.dp)
                         .height(50.dp)
                         .padding(16.dp),
+                    color = Color.DarkGray
                 )
                 Text(
                     text = calString,
                         modifier = Modifier
-                            .width(80.dp)
+                            .width(120.dp)
                             .height(50.dp)
                             .padding(16.dp),
+                    color = Color.DarkGray
                 )
             }
         }
@@ -281,6 +279,7 @@ class MainActivity : FragmentActivity(){
                             }
                         }) {
                             Text(text = it.toString())
+                            //Text(text = it.toString())
                         }
                     }
                 }
