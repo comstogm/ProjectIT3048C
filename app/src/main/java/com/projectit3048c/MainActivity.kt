@@ -77,8 +77,6 @@ class MainActivity : FragmentActivity(){
     private var selectedFood: Food? = null
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var inFoodName: String = ""
-    private var inCkalories: String = ""
-    private var totalCal : Int = 0
     private var strUri by mutableStateOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -211,13 +209,13 @@ class MainActivity : FragmentActivity(){
                                 it.foodCkalories = 0
                             } else {
                                 //We have selected an existing Entry
+                                specimenText = it.toString()
                                 selectedFood = Food(name = "", description = "", calories = "")
                                 inFoodName = it.foodName
-                                inCkalories = it.foodCkalories.toString()
-                                totalCal += it.foodCkalories
+
                             }
                             viewModel.selectedFoodAmount = it
-                            viewModel.fetchPhotos()
+                            //viewModel.fetchPhotos()
                         }) {
                             Text(text = it.toString())
                         }
@@ -265,7 +263,7 @@ class MainActivity : FragmentActivity(){
                 )
             }
             Text(
-                text = (curPercentage.value).toInt().toString()+"/"+(2400-curPercentage.value).toInt().toString(),
+                text = "${viewModel.totalCalories} / $percentage",
                 color = Color.DarkGray,
                 fontSize = fontSize,
                 fontWeight = FontWeight.Bold
@@ -281,6 +279,7 @@ class MainActivity : FragmentActivity(){
         selectedFoodAmount: FoodAmount = FoodAmount(),
         selectedFood: Food = Food(),
     ) {
+        var inCkalories by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodIntake) }
         var inIntake by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodIntake) }
         var inAmount by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodAmount) }
         var pickedDate by remember { mutableStateOf(LocalDate.now()) }
@@ -338,8 +337,8 @@ class MainActivity : FragmentActivity(){
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxWidth()
             ){
-                val floatTotalCkal = totalCal.toFloat()
-                CircleProgressBar(floatTotalCkal, number = 1)
+                //val floatTotalCkal = totalCal.toFloat()
+                CircleProgressBar(2000.toFloat(), viewModel.totalCalories)
             }
             Row(modifier = Modifier.padding(all = 2.dp)) {
                 TextFieldWithDropdownUsage(
@@ -347,12 +346,14 @@ class MainActivity : FragmentActivity(){
                     label = stringResource(R.string.foodName),
                     selectedFoodAmount = selectedFoodAmount
                 )
-                TextField(value = inCkalories + " ckal",
-                    onValueChange = { inCkalories = it },
-                    colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White
-                ))
+
             }
+            OutlinedTextField(
+                value = inCkalories,
+                onValueChange = { inCkalories = it },
+                label = { Text(stringResource(R.string.foodCkalories)) },
+                modifier = Modifier.fillMaxWidth()
+            )
             OutlinedTextField(
                 value = inIntake,
                 onValueChange = { inIntake = it },
@@ -376,11 +377,13 @@ class MainActivity : FragmentActivity(){
                             foodAmount = inAmount
                             foodIntake = inIntake
                             foodDate = pickedDate.toString()
-                            for (food in foods) {
-                                if (food.name.contains(foodName)) {
-                                    foodCkalories = food.calories.toInt()
-                                }
-                            }
+                            //Error Checking needed
+                            foodCkalories = inCkalories.toInt()
+//                            for (food in foods) {
+//                                if (food.name.contains(foodName)) {
+//                                    foodCkalories = food.calories.toInt()
+//                                }
+//                            }
                         }
                         viewModel.saveFoodAmount()
                         Toast.makeText(

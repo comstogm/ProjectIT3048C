@@ -27,6 +27,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     var user: User? = null
     val eventPhotos : MutableLiveData<List<Photo>> = MutableLiveData<List<Photo>>()
     var selectedDate by mutableStateOf(LocalDate.now())
+    var totalCalories by mutableStateOf(0)
 
 
     private lateinit var firestore : FirebaseFirestore
@@ -51,10 +52,12 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
                     val allFoodSpecimens = ArrayList<FoodAmount>()
                     allFoodSpecimens.add(FoodAmount(foodName = NEW_FOODAMOUNT))
                     val documents = snapshot.documents
+                    totalCalories = 0
                     documents.forEach {
                         val foodSpecimen = it.toObject(FoodAmount::class.java)
                         foodSpecimen?.let {
                             allFoodSpecimens.add(it)
+                            totalCalories += it.foodCkalories
                         }
                     }
                     foodAmounts.value = allFoodSpecimens
