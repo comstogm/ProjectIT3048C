@@ -148,7 +148,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     }
 
     fun fetchPhotos() {
-        //photos.clear()
+        photos.clear()
         user?.let {
             user ->
             var photoCollection = firestore.collection("users").document(user.uid).collection("dates").document(selectedDate.toString()).collection("specimens").document(selectedFoodAmount.foodId).collection("photos")
