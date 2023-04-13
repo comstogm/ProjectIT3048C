@@ -123,49 +123,16 @@ class MainActivity : FragmentActivity(){
                 it.toString().startsWith(value.text) && it.toString() != value.text
             }.take(3)
         }
-        Column {
-            TextFieldWithDropdown(
-                modifier = Modifier.fillMaxWidth(),
-                value = textFieldValue.value,
-                setValue = ::onValueChanged,
-                onDismissRequest = ::onDropdownDismissRequest,
-                dropDownExpanded = dropDownExpanded.value,
-                list = dropDownOptions.value,
-                label = label
-            )
-            Row {
-                var calString : String = ""
-                if(inFoodName == "" || inCkalories == "0" ){
-                    calString = ""
-                    inDescription = ""
-                }else{
-                    for (food in dataIn) {
-                        if (food.name == inFoodName) {
-                            inCkalories = food.calories
-                            inDescription = food.description
-                        }
-                    }
-                    calString = inCkalories + " Cal"
-                }
-                Text(
-                    text = inDescription,
-                    modifier = Modifier
-                        .width(220.dp)
-                        .height(50.dp)
-                        .padding(16.dp),
-                    color = Color.DarkGray
-                )
-                Text(
-                    text = calString,
-                        modifier = Modifier
-                            .width(120.dp)
-                            .height(50.dp)
-                            .padding(16.dp),
-                    color = Color.DarkGray
-                )
-            }
-        }
 
+        TextFieldWithDropdown(
+            modifier = Modifier.width(300.dp),
+            value = textFieldValue.value,
+            setValue = ::onValueChanged,
+            onDismissRequest = ::onDropdownDismissRequest,
+            dropDownExpanded = dropDownExpanded.value,
+            list = dropDownOptions.value,
+            label = label
+        )
     }
 
     @Composable
@@ -253,7 +220,6 @@ class MainActivity : FragmentActivity(){
                             viewModel.fetchPhotos()
                         }) {
                             Text(text = it.toString())
-                            //Text(text = it.toString())
                         }
                     }
                 }
