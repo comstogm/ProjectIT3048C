@@ -262,7 +262,7 @@ class MainActivity : FragmentActivity(){
                 drawArc(
                     color = Color.LightGray,
                     -90f,
-                    360 * curPercentage.value/2400,
+                    360 * (viewModel.totalCalories / 2000.toFloat()),
                     useCenter = false,
                     style = Stroke(width = 20f, cap = StrokeCap.Round)
                 )
