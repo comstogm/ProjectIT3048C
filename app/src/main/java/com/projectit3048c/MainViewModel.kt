@@ -57,7 +57,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
                         val foodSpecimen = it.toObject(FoodAmount::class.java)
                         foodSpecimen?.let {
                             allFoodSpecimens.add(it)
-                            totalCalories += it.foodCkalories
+                            totalCalories += it.foodAmount.toInt()
                         }
                     }
                     foodAmounts.value = allFoodSpecimens
@@ -151,7 +151,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     }
 
     fun fetchPhotos() {
-        //photos.clear()
+        photos.clear()
         user?.let {
             user ->
             var photoCollection = firestore.collection("users").document(user.uid).collection("dates").document(selectedDate.toString()).collection("specimens").document(selectedFoodAmount.foodId).collection("photos")

@@ -206,16 +206,21 @@ class MainActivity : FragmentActivity(){
                                 //We have a new Entry
                                 specimenText = ""
                                 it.foodName = ""
-                                it.foodCkalories = 0
+                                it.foodAmount = ""
                             } else {
                                 //We have selected an existing Entry
                                 specimenText = it.toString()
                                 selectedFood = Food(name = "", description = "", calories = "")
                                 inFoodName = it.foodName
-
                             }
                             viewModel.selectedFoodAmount = it
-                            //viewModel.fetchPhotos()
+                            if(it.foodName != "") {
+                                viewModel.selectedFoodAmount = it
+                                viewModel.fetchPhotos()
+                            } else {
+                                viewModel.selectedFoodAmount = it
+                            }
+
                         }) {
                             Text(text = it.toString())
                         }
@@ -279,7 +284,6 @@ class MainActivity : FragmentActivity(){
         selectedFoodAmount: FoodAmount = FoodAmount(),
         selectedFood: Food = Food(),
     ) {
-        var inCkalories by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodIntake) }
         var inIntake by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodIntake) }
         var inAmount by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodAmount) }
         var pickedDate by remember { mutableStateOf(LocalDate.now()) }
@@ -332,6 +336,7 @@ class MainActivity : FragmentActivity(){
                         viewModel.listenToFoodSpecimens()
                     }
                 }
+
             FoodAmountSpinner(foodAmountList = loggedFoods)
             Box(
                 contentAlignment = Alignment.Center,
@@ -340,20 +345,15 @@ class MainActivity : FragmentActivity(){
                 //val floatTotalCkal = totalCal.toFloat()
                 CircleProgressBar(2000.toFloat(), viewModel.totalCalories)
             }
+
             Row(modifier = Modifier.padding(all = 2.dp)) {
                 TextFieldWithDropdownUsage(
                     dataIn = foods,
                     label = stringResource(R.string.foodName),
                     selectedFoodAmount = selectedFoodAmount
                 )
-
             }
-            OutlinedTextField(
-                value = inCkalories,
-                onValueChange = { inCkalories = it },
-                label = { Text(stringResource(R.string.foodCkalories)) },
-                modifier = Modifier.fillMaxWidth()
-            )
+
             OutlinedTextField(
                 value = inIntake,
                 onValueChange = { inIntake = it },
@@ -363,7 +363,7 @@ class MainActivity : FragmentActivity(){
             OutlinedTextField(
                 value = inAmount,
                 onValueChange = { inAmount = it },
-                label = { Text(stringResource(R.string.foodAmount)) },
+                label = { Text(stringResource(R.string.Calories)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Row(modifier = Modifier.padding(all = 2.dp)) {
@@ -377,13 +377,6 @@ class MainActivity : FragmentActivity(){
                             foodAmount = inAmount
                             foodIntake = inIntake
                             foodDate = pickedDate.toString()
-                            //Error Checking needed
-                            foodCkalories = inCkalories.toInt()
-//                            for (food in foods) {
-//                                if (food.name.contains(foodName)) {
-//                                    foodCkalories = food.calories.toInt()
-//                                }
-//                            }
                         }
                         viewModel.saveFoodAmount()
                         Toast.makeText(

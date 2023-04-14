@@ -5,8 +5,7 @@ data class FoodAmount(var foodId: String = "", //firebase identifier
                       var internalFoodID: Int = 0,
                       var foodIntake: String = "",
                       var foodAmount: String = "",
-                      var foodDate: String = "",
-                      var foodCkalories: Int = 0) {
+                      var foodDate: String = "") {
     override fun toString(): String {
         return "$foodName"
     }
