@@ -6,5 +6,6 @@
     <string name="foodLoged">Date</string>
     <string name="intake">Intake</string>
     <string name="foodCkalories">Ckalories</string>
+    <string name="Calories">Calories</string>
 
 </resources>
