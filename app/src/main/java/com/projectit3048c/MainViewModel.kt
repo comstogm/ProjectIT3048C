@@ -28,8 +28,6 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     val eventPhotos : MutableLiveData<List<Photo>> = MutableLiveData<List<Photo>>()
     var selectedDate by mutableStateOf(LocalDate.now())
     var totalCalories by mutableStateOf(0)
-
-
     private lateinit var firestore : FirebaseFirestore
     private var storageReference = FirebaseStorage.getInstance().getReference()
     init {
@@ -72,9 +70,10 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
            foods.postValue(innerFoods!!)
         }
     }
-    internal fun deleteSavedFoodDatabase(foodAmounts: FoodAmount){
-        // TODO:  
-    }
+
+//    internal fun deleteSavedFoodDatabase(foodAmounts: FoodAmount){
+//        // TODO:
+//    }
 
     fun saveFoodAmount() {
         user?.let {
@@ -93,7 +92,6 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
                 if (photos.isNotEmpty()) {
                     uploadPhotos()
                 }
-
             }
             handle.addOnFailureListener { Log.e("Firebase", "Save failed $it ") }
         }
@@ -164,8 +162,6 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
                     documents?.forEach {
                         var photo = it.toObject(Photo::class.java)
                         photo?.let {
-                            //photo ->
-                            //photos.add(it)
                          inPhotos.add(it)
                         }
                     }
@@ -173,6 +169,12 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
                 }
             }
         }
+    }
+
+    fun deletForNew(){
+        photos.clear()
+        var inPhotos = ArrayList<Photo>()
+        eventPhotos.value = inPhotos
     }
 
     fun delete(photo: Photo) {
