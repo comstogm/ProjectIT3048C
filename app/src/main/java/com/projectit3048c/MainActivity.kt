@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.SnackbarDefaults.backgroundColor
@@ -36,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -53,7 +55,6 @@ import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.projectit3048c.dto.*
-import com.projectit3048c.service.FoodService
 import com.projectit3048c.ss23.R
 import com.projectit3048c.ss23.ui.theme.Orange
 import com.projectit3048c.ss23.ui.theme.ProjectIT3048CTheme
@@ -123,7 +124,9 @@ class MainActivity : FragmentActivity(){
         }
 
         TextFieldWithDropdown(
-            modifier = Modifier.width(300.dp),
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth(),
             value = textFieldValue.value,
             setValue = ::onValueChanged,
             onDismissRequest = ::onDropdownDismissRequest,
@@ -146,7 +149,7 @@ class MainActivity : FragmentActivity(){
         Box(modifier) {
             TextField(
                 modifier = Modifier
-                    .width(300.dp)
+                    .fillMaxWidth()
                     .onFocusChanged { focusState ->
                         if (!focusState.isFocused)
                             onDismissRequest()
@@ -188,7 +191,7 @@ class MainActivity : FragmentActivity(){
         var expanded by remember { mutableStateOf(false) }
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Row(Modifier
-                .padding(24.dp)
+                .padding(15.dp)
                 .clickable {
                     expanded = !expanded
                 }
@@ -206,7 +209,7 @@ class MainActivity : FragmentActivity(){
                                 //We have a new Entry
                                 specimenText = ""
                                 it.foodName = ""
-                                it.foodAmount = ""
+                                it.foodAmount = "0"
                             } else {
                                 //We have selected an existing Entry
                                 specimenText = it.toString()
@@ -219,8 +222,8 @@ class MainActivity : FragmentActivity(){
                                 viewModel.fetchPhotos()
                             } else {
                                 viewModel.selectedFoodAmount = it
+                                viewModel.deletForNew()
                             }
-
                         }) {
                             Text(text = it.toString())
                         }
@@ -232,10 +235,9 @@ class MainActivity : FragmentActivity(){
 
     @Composable
     fun CircleProgressBar(
-        percentage: Float,
+        percentage: Int,
         number: Int,
         fontSize: TextUnit = 20.sp,
-        //fontSize2: TextUnit = 20.sp,
         radius: Dp = 80.dp,
         animDuration: Int = 1000,
         animDelay: Int = 0
@@ -244,7 +246,7 @@ class MainActivity : FragmentActivity(){
             mutableStateOf(false)
         }
         val curPercentage = animateFloatAsState(
-            targetValue = if (animationPlayed) percentage else 0f,
+            targetValue = (if (animationPlayed) percentage else 0).toFloat(),
             animationSpec = tween(
                 durationMillis = animDuration,
                 delayMillis = animDelay
@@ -287,159 +289,188 @@ class MainActivity : FragmentActivity(){
         var inIntake by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodIntake) }
         var inAmount by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodAmount) }
         var pickedDate by remember { mutableStateOf(LocalDate.now()) }
-        val formattedDate by remember { derivedStateOf { DateTimeFormatter.ofPattern("MMM dd YYYY").format(pickedDate) }}
-        val dateDialogState = rememberMaterialDialogState()
+        //val formattedDate by remember { derivedStateOf { DateTimeFormatter.ofPattern("MMM dd YYYY").format(pickedDate) }}
+        //val dateDialogState = rememberMaterialDialogState()
         val context = LocalContext.current
-        Column {
-            //Spacer(modifier = Modifier.height(50.dp))
-                Button(
-                    onClick = {
-                        dateDialogState.show()
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color.White,
-                        contentColor = Color.DarkGray
-                    ),
-                    modifier = Modifier
-                        .border(
-                            BorderStroke(width = 2.dp, color = Color.LightGray),
-                            //shape = RoundedCornerShape(16.dp),
-                        )
-                        .height(70.dp)
-                        //.width(300.dp)
-                        //.wrapContentWidth()
-                        .fillMaxWidth()
-                )
-                {
-                    Text(text = formattedDate)
-                }
-                MaterialDialog(
-                    dialogState = dateDialogState,
-                    buttons = {
-                        positiveButton(text = "Ok") {
-                            Toast.makeText(
-                                applicationContext,
-                                "CLicked ok",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                        negativeButton(text = "Cancel")
-                    }
-                ) {
-                    datepicker(
-                        initialDate = LocalDate.now(),
-                        title = "Pick a date",
-                        colors = DatePickerDefaults.colors(Orange),
-                    ) {
-                        pickedDate = it
-                        viewModel.selectedDate = it
-                        viewModel.listenToFoodSpecimens()
-                    }
-                }
 
+        Column {
+            DatePickerCalendar()
             FoodAmountSpinner(foodAmountList = loggedFoods)
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxWidth()
-            ){
-                //val floatTotalCkal = totalCal.toFloat()
-                CircleProgressBar(2000.toFloat(), viewModel.totalCalories)
+            ) {
+                CircleProgressBar(2400, viewModel.totalCalories)
             }
-
-            Row(modifier = Modifier.padding(all = 2.dp)) {
-                TextFieldWithDropdownUsage(
-                    dataIn = foods,
-                    label = stringResource(R.string.foodName),
-                    selectedFoodAmount = selectedFoodAmount
-                )
+            TextFieldWithDropdownUsage(
+                dataIn = foods,
+                label = stringResource(R.string.foodName),
+                selectedFoodAmount = selectedFoodAmount
+            )
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedTextField(
+                        value = inIntake,
+                        onValueChange = { inIntake = it },
+                        label = { Text(stringResource(R.string.intake)) },
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .weight(1f)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    TextField(
+                        value = inAmount,
+                        onValueChange = { newValue ->
+                            if (newValue.isEmpty()) {
+                                inAmount = "0"
+                            } else {
+                                inAmount = newValue.toString()
+                            }
+                        },
+                        label = { Text(stringResource(R.string.Calories)) },
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .padding(8.dp)
+                            .weight(0.5f),
+                        colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                        maxLines = 1
+                    )
+                }
             }
-
-            OutlinedTextField(
-                value = inIntake,
-                onValueChange = { inIntake = it },
-                label = { Text(stringResource(R.string.intake)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = inAmount,
-                onValueChange = { inAmount = it },
-                label = { Text(stringResource(R.string.Calories)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Row(modifier = Modifier.padding(all = 2.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth().padding(8.dp)
+            ) {
                 Button(
                     onClick = {
-                        selectedFoodAmount.apply {
-                            foodName = inFoodName
-                            internalFoodID = selectedFood?.let() {
-                                it.id
-                            } ?: 0
-                            foodAmount = inAmount
-                            foodIntake = inIntake
-                            foodDate = pickedDate.toString()
+                        if (inFoodName != "") {
+                            selectedFoodAmount.apply {
+                                foodName = inFoodName
+                                internalFoodID = selectedFood?.let() {
+                                    it.id
+                                } ?: 0
+                                foodAmount = inAmount
+                                foodIntake = inIntake
+                                foodDate = pickedDate.toString()
+                            }
+                            viewModel.saveFoodAmount()
+                            Toast.makeText(
+                                context,
+                                "$inFoodName $inAmount $inIntake",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Empty fields",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
-                        viewModel.saveFoodAmount()
-                        Toast.makeText(
-                            context,
-                            "$inFoodName $inAmount $inIntake $pickedDate",
-                            Toast.LENGTH_LONG
-                        ).show()
                     },
-                    modifier = Modifier
-                        .padding(8.dp)
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text(text = "Add")
                 }
+                Spacer(modifier = Modifier.width(16.dp))
                 Button(
                     onClick = {
                         signIn()
                     },
-                    modifier = Modifier
-                        .padding(8.dp)
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text(text = "Login")
                 }
+                Spacer(modifier = Modifier.width(16.dp))
                 Button(
                     onClick = {
                         takePhoto()
                     },
-                    modifier = Modifier
-                        .padding(8.dp)
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text(text = "Photo")
                 }
             }
             Events()
         }
+    }
+//        fun delete(foodAmounts: FoodAmount) {
+//            //  ViewModel.deleteSavedFoodDatabase(foodAmounts)
+//        }
 
-        fun delete(foodAmounts: FoodAmount) {
-            //  ViewModel.deleteSavedFoodDatabase(foodAmounts)
+//        @Composable
+//        fun EventListItem2(foodAmounts: FoodAmount) {
+//            Row {
+//                Column(Modifier.weight(6f)) {
+//                    Text(text = foodAmounts.foodId, style = typography.h6)
+//                    Text(text = foodAmounts.foodName, style = typography.caption)
+//                }
+//                Column(Modifier.weight(1f)) {
+//                    Button(
+//                        onClick = { delete(foodAmounts) }
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Filled.Delete,
+//                            contentDescription = "Delete"
+//                        )
+//                    }
+//                }
+//                Button(
+//                    onClick = {
+//                        signIn()
+//                    }
+//                ) {
+//                    Text(text = "Logon")
+//                }
+//            }
+//        }
+
+
+    private @Composable
+    fun DatePickerCalendar() {
+        var pickedDate by remember { mutableStateOf(LocalDate.now()) }
+        val formattedDate by remember { derivedStateOf { DateTimeFormatter.ofPattern("MMM dd YYYY").format(pickedDate) }}
+        val dateDialogState = rememberMaterialDialogState()
+        Button(
+            onClick = {
+                dateDialogState.show()
+            },
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.White,
+                contentColor = Color.DarkGray
+            ),
+            modifier = Modifier
+                .border(
+                    BorderStroke(width = 2.dp, color = Color.LightGray),
+                )
+                .height(50.dp)
+                .fillMaxWidth()
+        )
+        {
+            Text(text = formattedDate)
         }
-
-        @Composable
-        fun EventListItem2(foodAmounts: FoodAmount) {
-            Row {
-                Column(Modifier.weight(6f)) {
-                    Text(text = foodAmounts.foodId, style = typography.h6)
-                    Text(text = foodAmounts.foodName, style = typography.caption)
+        MaterialDialog(
+            dialogState = dateDialogState,
+            buttons = {
+                positiveButton(text = "Ok") {
+                    Toast.makeText(
+                        applicationContext,
+                        "CLicked ok",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
-                Column(Modifier.weight(1f)) {
-                    Button(
-                        onClick = { delete(foodAmounts) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = "Delete"
-                        )
-                    }
-                }
-                Button(
-                    onClick = {
-                        signIn()
-                    }
-                ) {
-                    Text(text = "Logon")
-                }
+                negativeButton(text = "Cancel")
+            }
+        ) {
+            datepicker(
+                initialDate = LocalDate.now(),
+                title = "Pick a date",
+                colors = DatePickerDefaults.colors(Orange),
+            ) {
+                pickedDate = it
+                viewModel.selectedDate = it
+                viewModel.listenToFoodSpecimens()
             }
         }
     }
@@ -468,7 +499,7 @@ class MainActivity : FragmentActivity(){
             backgroundColor = MaterialTheme.colors.background,
             contentColor = contentColorFor(backgroundColor),
             shape = RoundedCornerShape(20.dp),
-            border = BorderStroke(1.dp, Color.Black)
+            border = BorderStroke(1.dp, Color.LightGray)
         )
         {
             Row {
@@ -476,12 +507,13 @@ class MainActivity : FragmentActivity(){
                     AsyncImage(
                         model = photo.localUri, contentDescription = "Event Image",
                         Modifier
-                            .width(64.dp)
-                            .height(64.dp)
+                            .width(120.dp)
+                            .height(130.dp)
+                            .padding(15.dp)
                     )
                 }
-                Column(Modifier.weight(4f)) {
-                    Text(text = photo.id, style = typography.h6)
+                Column(Modifier.weight(3.5f).padding(5.dp)) {
+                    Text(text = inFoodName, style = typography.h6)
                     Text(text = photo.dateTaken.toString(), style = typography.caption)
                     OutlinedTextField(
                         value = inDescription,
@@ -491,17 +523,17 @@ class MainActivity : FragmentActivity(){
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-                Column(Modifier.weight(1f)) {
+                Column(Modifier.weight(1.1f).padding(5.dp)) {
                     Button(
                         onClick = {
-                            //photo.description = inDescription
+                            photo.description = inDescription
                             save(photo)
                         }
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Check,
                             contentDescription = "Save",
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 5.dp)
                         )
                     }
                     Button(
@@ -512,7 +544,7 @@ class MainActivity : FragmentActivity(){
                         Icon(
                             imageVector = Icons.Filled.Delete,
                             contentDescription = "Delete",
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 5.dp)
                         )
                     }
                 }
@@ -522,9 +554,7 @@ class MainActivity : FragmentActivity(){
 
     private fun delete(photo: Photo) {
         viewModel.delete(photo)
-
     }
-
 
     private fun save(photo: Photo) {
         viewModel.updatePhotoDatabase(photo)
