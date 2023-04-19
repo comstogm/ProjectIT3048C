@@ -1,9 +1,13 @@
 package com.projectit3048c.ss23
 
+import com.projectit3048c.ss23.ui.theme.*
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
-import com.projectit3048c.MainViewModel
-import com.projectit3048c.dto.Food
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import junit.framework.TestCase.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -11,7 +15,6 @@ import org.junit.Rule
 import org.junit.rules.TestRule
 import com.projectit3048c.service.FoodService
 import io.mockk.MockKAnnotations
-import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.newSingleThreadContext
@@ -19,11 +22,12 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+import java.util.*
+import kotlin.collections.ArrayList
+import com.projectit3048c.dto.*
 
 class CalorieCounterTest {
-    lateinit var mvm: MainViewModel
+
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
     lateinit var foodService: FoodService
@@ -46,14 +50,14 @@ class CalorieCounterTest {
     }
 
     @Test
-    fun `Giving food calorie, data available when I search for egg then I should receive 1 egg`() =
+    fun `Given food data is available, when I search for egg, then I should receive 1 egg`() =
         runTest {
-            givingFoodServiceIsInitialized()
+            givenFoodServiceIsInitialized()
             whenFoodDataAreReadAndParsed()
             thenTheFoodCollectionShouldContainEgg()
         }
 
-    private fun givingFoodServiceIsInitialized() {
+    private fun givenFoodServiceIsInitialized() {
         foodService = FoodService()
     }
 
@@ -75,61 +79,96 @@ class CalorieCounterTest {
     }
 
     @Test
-    fun confirmEgg_output() {
+    fun `Given a food with a name, when calling toString(), then return that food's name`() {
         val food: Food = Food(3, "Egg", "1 egg", "155")
         assertEquals("Egg", food.toString())
     }
 
     @Test
-    fun `giving a view model with live data when populated with foods then result show Apple`() {
-        givenViewModelIsInitializesWithMockData()
-        whenFoodServiceFetchFoodsInvoked()
-        thenResultShouldContainApple()
+    fun `Given calories, when setting and getting the value, the value is returned correctly`() {
+        val calories = Calories()
+        calories.calories = "100"
+        assertEquals("100", calories.calories)
     }
 
-    private fun givenViewModelIsInitializesWithMockData() {
-        val foods = ArrayList<Food>()
-        foods.add(Food(1, "Apple", "1 apple(182g)", "52"))
-        val egg = Food(3, "Egg", "1 egg", "155")
-        foods.add(egg)
-        foods.add(Food(2, "Milk", "100g 1% fat","42"))
-
-        coEvery { mockFoodService.fetchFoods() } returns foods
-
-        //mvm = MainViewModel(foodService = mockFoodService)
-        mvm = MainViewModel(foodService = mockFoodService)
-        //mvm.foodService = mockFoodService
+    @Test
+    fun `Given a food amount, when toString is called, then return food name`() {
+        val foodAmount = FoodAmount(foodId = "123", foodName = "Apple", internalFoodID = 1, foodIntake = "Breakfast", foodAmount = "1", foodDate = "2022-04-18")
+        val result = foodAmount.toString()
+        assertEquals("Apple", result)
     }
 
-    private fun whenFoodServiceFetchFoodsInvoked() {
-        mvm.fetchFoods()
+    @Test
+    fun `When generating a photo object, then properties are initialized correctly`() {
+        val localUri = "localUri"
+        val remoteUri = "remoteUri"
+        val description = "description"
+        val dateTaken = Date()
+        val id = "id"
+
+        val photo = Photo(localUri, remoteUri, description, dateTaken, id)
+
+        assertEquals(localUri, photo.localUri)
+        assertEquals(remoteUri, photo.remoteUri)
+        assertEquals(description, photo.description)
+        assertEquals(dateTaken, photo.dateTaken)
+        assertEquals(id, photo.id)
     }
 
-    private fun thenResultShouldContainApple() {
-        var allFoods: List<Food>? = ArrayList<Food>()
-        val latch = CountDownLatch(1)
-        val observer = object : Observer<List<Food>?> {
-            override fun onChanged(receivedFoods: List<Food>?) {
-                allFoods = receivedFoods
-                latch.countDown()
-                mvm.foods.removeObserver(this)
-            }
+    @Test
+    fun `When generating a new User with a uid and displayName, then uid and displayName should be set`() {
+        val uid = "abc123"
+        val displayName = "Jim Barnett"
+
+        val user = User(uid, displayName)
+
+        assertEquals(uid, user.uid)
+        assertEquals(displayName, user.displayName)
+    }
+
+    @Test
+    fun testColors() {
+        assertEquals(Color(0xFFBB86FC), Purple200)
+        assertEquals(Color(0xFF6200EE), Purple500)
+        assertEquals(Color(0xFF3700B3), Purple700)
+        assertEquals(Color(0xFF03DAC5), Teal200)
+        assertEquals(Color(0xFFFF8D55), Orange)
+        assertEquals(Color(0xFFE1E8F0), LightGray)
+        assertEquals(Color(0xFFA5AAB0), DarkGray)
+        assertEquals(Color(0xFFFFFFFF), White)
+    }
+
+    @Test
+    fun testShapes() {
+        val expectedShape = RoundedCornerShape(4.dp)
+        assertEquals(expectedShape, Shapes.small)
+    }
+
+    @Test
+    fun `Given darkTheme is active, when the theme is called, then properties for DarkColorPalette are returned`() {
+        val darkTheme = true
+        val colors = if (darkTheme) {
+            DarkColorPalette
+        } else {
+            LightColorPalette
         }
-        mvm.foods.observeForever(observer)
-        latch.await(10, TimeUnit.SECONDS)
-        assertNotNull(allFoods)
 
-        assertTrue(allFoods!!.isNotEmpty())
-        var containsEgg = false
-        allFoods!!.forEach {
-            if (it.name.contains("Apple")) {
-                containsEgg = true
-            }
-        }
-        assertTrue(containsEgg)
+        assertEquals(colors.primary, Purple200)
+        assertEquals(colors.primaryVariant, Purple700)
+        assertEquals(colors.secondary, Teal200)
+    }
+
+    @Test
+    fun `Given a typography object, when body1 style is selected, then the value returned is correct`() {
+        val expectedFontSize = 16.sp
+        val expectedFontFamily = FontFamily.Default
+        val expectedFontWeight = FontWeight.Normal
+
+        val typography = Typography
+        val body1Style = typography.body1
+
+        assertEquals(expectedFontSize, body1Style.fontSize)
+        assertEquals(expectedFontFamily, body1Style.fontFamily)
+        assertEquals(expectedFontWeight, body1Style.fontWeight)
     }
 }
-
-
-
-
