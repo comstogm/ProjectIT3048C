@@ -81,14 +81,14 @@ class CalorieCounterTest {
     @Test
     fun `Given a food with a name, when calling toString(), then return that food's name`() {
         val food: Food = Food(3, "Egg", "1 egg", "155")
-        assertEquals("Egg", food.toString())
+        assertEquals("Egg 1 egg 155 Cal", food.toString())
     }
 
     @Test
     fun `Given calories, when setting and getting the value, the value is returned correctly`() {
-        val calories = Calories()
-        calories.calories = "100"
-        assertEquals("100", calories.calories)
+        val calories = FoodAmount()
+        calories.foodAmount = "100"
+        assertEquals("100", calories.foodAmount)
     }
 
     @Test
