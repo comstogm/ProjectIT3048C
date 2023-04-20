@@ -67,6 +67,10 @@ dependencies {
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0'
     implementation 'com.squareup.retrofit2:retrofit:2.7.1'
     implementation 'com.squareup.retrofit2:converter-gson:2.7.1'
+    implementation 'androidx.test:core-ktx:1.5.0'
+    testImplementation "io.insert-koin:koin-test:3.3.3"
+    testImplementation 'org.robolectric:robolectric:4.10'
+    androidTestImplementation "androidx.compose.ui:ui-test:$compose_ui_version"
 
     // Koin
     implementation "io.insert-koin:koin-android:3.3.3"
