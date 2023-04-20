@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentActivity
@@ -82,8 +83,7 @@ class MainActivity : FragmentActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            viewModel.fetchFoods()
+        setContent { viewModel.fetchFoods()
             firebaseUser?.let {
                 val user = User(it.uid, "")
                 viewModel.user = user
@@ -92,7 +92,6 @@ class MainActivity : FragmentActivity(){
             val foods by viewModel.foods.observeAsState(initial = emptyList())
             val foodAmounts by viewModel.foodAmounts.observeAsState(initial = emptyList())
             ProjectIT3048CTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colors.background
@@ -105,7 +104,6 @@ class MainActivity : FragmentActivity(){
 
     @Composable
     fun TextFieldWithDropdownUsage(dataIn: List<Food>, label : String = "", selectedFoodAmount: FoodAmount = FoodAmount()) {
-
         val dropDownOptions = remember { mutableStateOf(listOf<Food>()) }
         val textFieldValue = remember(selectedFoodAmount.foodId) { mutableStateOf(TextFieldValue(selectedFoodAmount.foodName)) }
         val dropDownExpanded = remember { mutableStateOf(false) }
@@ -206,12 +204,10 @@ class MainActivity : FragmentActivity(){
                         DropdownMenuItem(onClick = {
                             expanded = false
                             if (it.foodName == viewModel.NEW_FOODAMOUNT) {
-                                //We have a new Entry
                                 specimenText = ""
                                 it.foodName = ""
                                 it.foodAmount = "0"
                             } else {
-                                //We have selected an existing Entry
                                 specimenText = it.toString()
                                 selectedFood = Food(name = "", description = "", calories = "")
                                 inFoodName = it.foodName
@@ -222,7 +218,7 @@ class MainActivity : FragmentActivity(){
                                 viewModel.fetchPhotos()
                             } else {
                                 viewModel.selectedFoodAmount = it
-                                viewModel.deletForNew()
+                                viewModel.deletPhotosForNewFood()
                             }
                         }) {
                             Text(text = it.toString())
@@ -289,8 +285,6 @@ class MainActivity : FragmentActivity(){
         var inIntake by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodIntake) }
         var inAmount by remember(selectedFoodAmount.foodId) { mutableStateOf(selectedFoodAmount.foodAmount) }
         var pickedDate by remember { mutableStateOf(LocalDate.now()) }
-        //val formattedDate by remember { derivedStateOf { DateTimeFormatter.ofPattern("MMM dd YYYY").format(pickedDate) }}
-        //val dateDialogState = rememberMaterialDialogState()
         val context = LocalContext.current
 
         Column {
@@ -343,89 +337,83 @@ class MainActivity : FragmentActivity(){
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth().padding(8.dp)
             ) {
-                Button(
-                    onClick = {
-                        if (inFoodName != "") {
-                            selectedFoodAmount.apply {
-                                foodName = inFoodName
-                                internalFoodID = selectedFood?.let() {
-                                    it.id
-                                } ?: 0
-                                foodAmount = inAmount
-                                foodIntake = inIntake
-                                foodDate = pickedDate.toString()
-                            }
-                            viewModel.saveFoodAmount()
-                            Toast.makeText(
-                                context,
-                                "$inFoodName $inAmount $inIntake",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "Empty fields",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = "Add")
-                }
-                Spacer(modifier = Modifier.width(16.dp))
-                Button(
-                    onClick = {
-                        signIn()
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = "Login")
-                }
-                Spacer(modifier = Modifier.width(16.dp))
-                Button(
-                    onClick = {
-                        takePhoto()
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = "Photo")
-                }
+               if(firebaseUser != null ) {
+                   Button(
+                       onClick = {
+                           if (inFoodName != "") {
+                               selectedFoodAmount.apply {
+                                   foodName = inFoodName
+                                   internalFoodID = selectedFood?.let() {
+                                       it.id
+                                   } ?: 0
+                                   foodAmount = inAmount
+                                   foodIntake = inIntake
+                                   foodDate = pickedDate.toString()
+                               }
+                               viewModel.saveFoodAmount()
+                               firebaseUser?.let {
+                                   Toast.makeText(
+                                       context,
+                                       "$inFoodName $inAmount $inIntake",
+                                       Toast.LENGTH_LONG
+                                   ).show()
+                               } ?: Toast.makeText(
+                                   context,
+                                   "Please Login",
+                                   Toast.LENGTH_LONG
+                               ).show()
+                           } else {
+                               Toast.makeText(
+                                   context,
+                                   "Empty fields",
+                                   Toast.LENGTH_LONG
+                               ).show()
+                           }
+                       },
+                       modifier = Modifier.weight(1f)
+                   ) {
+                       Text(text = "Add")
+                   }
+                   Spacer(modifier = Modifier.width(14.dp))
+                   Button(
+                       onClick = {
+                           takePhoto()
+                       },
+                       modifier = Modifier.weight(1f)
+                   ) {
+                       Text(text = "Photo")
+                   }
+                   Spacer(modifier = Modifier.width(14.dp))
+                   Button(
+                       onClick = {
+                           AuthUI.getInstance().signOut(context)
+                               .addOnCompleteListener {
+                               }
+                           Toast.makeText(
+                               context,
+                               "You are Logged Out",
+                               Toast.LENGTH_LONG
+                           ).show()
+                       },
+                       modifier = Modifier.weight(1f)
+                   ) {
+                       Text(text = "Logout")
+                   }
+               } else {
+                   Spacer(modifier = Modifier.width(14.dp).padding(8.dp))
+                   Button(
+                       onClick = {
+                           signIn()
+                       },
+                       modifier = Modifier.weight(1f)
+                   ) {
+                       Text(text = "Login")
+                   }
+               }
             }
             Events()
         }
     }
-//        fun delete(foodAmounts: FoodAmount) {
-//            //  ViewModel.deleteSavedFoodDatabase(foodAmounts)
-//        }
-
-//        @Composable
-//        fun EventListItem2(foodAmounts: FoodAmount) {
-//            Row {
-//                Column(Modifier.weight(6f)) {
-//                    Text(text = foodAmounts.foodId, style = typography.h6)
-//                    Text(text = foodAmounts.foodName, style = typography.caption)
-//                }
-//                Column(Modifier.weight(1f)) {
-//                    Button(
-//                        onClick = { delete(foodAmounts) }
-//                    ) {
-//                        Icon(
-//                            imageVector = Icons.Filled.Delete,
-//                            contentDescription = "Delete"
-//                        )
-//                    }
-//                }
-//                Button(
-//                    onClick = {
-//                        signIn()
-//                    }
-//                ) {
-//                    Text(text = "Logon")
-//                }
-//            }
-//        }
-
 
     private @Composable
     fun DatePickerCalendar() {

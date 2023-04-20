@@ -40,12 +40,10 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
             user ->
             firestore.collection("users").document(user.uid).collection("dates").document(selectedDate.toString()).collection("specimens").addSnapshotListener {
                     snapshot, e ->
-                //handle error
                 if(e != null) {
                     Log.w("Listen failed", e)
                     return@addSnapshotListener
                 }
-                //If we made it here, there is no error
                 snapshot?.let {
                     val allFoodSpecimens = ArrayList<FoodAmount>()
                     allFoodSpecimens.add(FoodAmount(foodName = NEW_FOODAMOUNT))
@@ -66,14 +64,10 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
 
     fun fetchFoods() {
         viewModelScope.launch {
-           var innerFoods = foodService.fetchFoods()
+           val innerFoods = foodService.fetchFoods()
            foods.postValue(innerFoods!!)
         }
     }
-
-//    internal fun deleteSavedFoodDatabase(foodAmounts: FoodAmount){
-//        // TODO:
-//    }
 
     fun saveFoodAmount() {
         user?.let {
@@ -94,7 +88,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
                 }
             }
             handle.addOnFailureListener { Log.e("Firebase", "Save failed $it ") }
-        }
+        }?: "No USER"
     }
 
     private fun uploadPhotos() {
@@ -171,7 +165,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
         }
     }
 
-    fun deletForNew(){
+    fun deletPhotosForNewFood(){
         photos.clear()
         var inPhotos = ArrayList<Photo>()
         eventPhotos.value = inPhotos
@@ -191,6 +185,6 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
                 .addOnFailureListener {
                     Log.e(TAG, "Photo delete failed. ${it.message}")
                 }
-        }
+        }?: "You are noy Logedin"
     }
 }
