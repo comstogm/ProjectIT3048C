@@ -343,9 +343,7 @@ class MainActivity : FragmentActivity(){
                            if (inFoodName != "") {
                                selectedFoodAmount.apply {
                                    foodName = inFoodName
-                                   internalFoodID = selectedFood?.let() {
-                                       it.id
-                                   } ?: 0
+                                   internalFoodID = selectedFood?.id ?: 0
                                    foodAmount = inAmount
                                    foodIntake = inIntake
                                    foodDate = pickedDate.toString()
@@ -506,7 +504,6 @@ class MainActivity : FragmentActivity(){
                     OutlinedTextField(
                         value = inDescription,
                         onValueChange = { inDescription = it },
-                        // label = { Text(stringResource(R.string.description))},
                         label = { Text("Description") },
                         modifier = Modifier.fillMaxWidth()
                     )

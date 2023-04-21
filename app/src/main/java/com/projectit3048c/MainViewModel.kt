@@ -72,11 +72,9 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
     fun saveFoodAmount() {
         user?.let {
             user ->
-            val document = if (selectedFoodAmount.foodId == null || selectedFoodAmount.foodId.isEmpty()) {
-                //create new FoodAmount
+            val document = if (selectedFoodAmount.foodId.isEmpty())  {
                 firestore.collection("users").document(user.uid).collection("dates").document(selectedDate.toString()).collection("specimens").document()
             } else {
-                //update existing FoodAmount
                 firestore.collection("users").document(user.uid).collection("dates").document(selectedDate.toString()).collection("specimens").document(selectedFoodAmount.foodId)
             }
             selectedFoodAmount.foodId = document.id
