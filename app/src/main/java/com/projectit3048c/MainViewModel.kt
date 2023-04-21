@@ -93,8 +93,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
         photos.forEach {
             photo ->
             var uri = Uri.parse(photo.localUri)
-            // nullable user entry creates technical debt. Wrap in let or enforce user on activity side.
-            val imageRef = storageReference.child("images/${user?.uid}/${uri.lastPathSegment}")
+             val imageRef = storageReference.child("images/${user?.uid}/${uri.lastPathSegment}")
             val uploadTask = imageRef.putFile(uri)
             uploadTask.addOnSuccessListener {
                 Log.i(TAG, "Image Uploaded $imageRef")
@@ -123,8 +122,7 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
             var handle = photoDocument.set(photo)
             handle.addOnSuccessListener {
                 Log.i(TAG, "Successfully update photo metadata")
-                //firestore.collection("users").document(user.uid).collection("dates").document(selectedDate.toString()).collection("specimens").document(selectedFoodAmount.foodId).collection("photos").document(photo.id).set(photo)
-            }
+             }
             handle.addOnFailureListener {
                 Log.e(TAG, "Error updating photo data: ${it.message}")
             }
