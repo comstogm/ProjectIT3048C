@@ -71,6 +71,9 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 
+/**
+ * MainActivity is the main entry point for the application
+ */
 class MainActivity : FragmentActivity(){
 
     private var uri: Uri? = null
@@ -81,6 +84,12 @@ class MainActivity : FragmentActivity(){
     private var inFoodName: String = ""
     private var strUri by mutableStateOf("")
 
+    /**
+     * Called when the activity is starting and sets the content of the activity to a composable UI
+     * Fetches data from the view model and listens to changes in food specimens
+     *
+     * @param savedInstanceState This Bundle contains the data it most recently supplied in [onSaveInstanceState]
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent { viewModel.fetchFoods()
@@ -134,6 +143,9 @@ class MainActivity : FragmentActivity(){
         )
     }
 
+    /**
+     *  Creates a composable TextField with a dropdown menu that allows the user to select a value from a list
+     */
     @Composable
     fun TextFieldWithDropdown(
         modifier: Modifier = Modifier,
@@ -183,6 +195,9 @@ class MainActivity : FragmentActivity(){
         }
     }
 
+    /**
+     * Composable function that displays a dropdown menu of food amounts to select from
+     */
     @Composable
     fun FoodAmountSpinner(foodAmountList: List<FoodAmount>) {
         var specimenText by remember { mutableStateOf("Logged Foods") }
@@ -229,6 +244,9 @@ class MainActivity : FragmentActivity(){
         }
     }
 
+    /**
+     * Composable function to generate a circular progress bar that fills based on a percentage
+     */
     @Composable
     fun CircleProgressBar(
         percentage: Int,
@@ -274,6 +292,9 @@ class MainActivity : FragmentActivity(){
         }
     }
 
+    /**
+     * A composable function that displays the calorie facts
+     */
     @Composable
     fun CalorieFacts(
         name: String,
@@ -413,6 +434,9 @@ class MainActivity : FragmentActivity(){
         }
     }
 
+    /**
+     * Displays a date picker calendar for the user to select a date and updates the view model
+     */
     private @Composable
     fun DatePickerCalendar() {
         var pickedDate by remember { mutableStateOf(LocalDate.now()) }
@@ -461,6 +485,9 @@ class MainActivity : FragmentActivity(){
         }
     }
 
+    /**
+     * A composable function that displays a list of events represented by photos
+     */
     @Composable
     private fun Events () {
         val photos by viewModel.eventPhotos.observeAsState(initial = emptyList())
@@ -474,6 +501,11 @@ class MainActivity : FragmentActivity(){
         }
     }
 
+    /**
+     * A composable function to display an item in a list of events
+     *
+     * @param photo The associated photo
+     */
     @Composable
     fun EventListItem(photo: Photo){
         var inDescription by remember(photo.id) {mutableStateOf(photo.description)}
@@ -537,14 +569,24 @@ class MainActivity : FragmentActivity(){
         }
     }
 
+    /**
+     * Deletes the [Photo] from the database
+     */
     private fun delete(photo: Photo) {
         viewModel.delete(photo)
     }
 
+    /**
+     * Saves the [Photo] to the database
+     */
     private fun save(photo: Photo) {
         viewModel.updatePhotoDatabase(photo)
     }
 
+
+    /**
+     * Saves the [Photo] to the database
+     */
     private fun takePhoto() {
         if (hasCameraPermission() == PERMISSION_GRANTED && hasExternalStoragePermission() == PERMISSION_GRANTED) {
             invokeCamera()
@@ -556,6 +598,11 @@ class MainActivity : FragmentActivity(){
         }
     }
 
+    /**
+     * Checks if permissions have been granted
+     * If they have the camera is invoked and a picture is taken
+     * If not then the user is prompted to provide permissions
+     */
     private val requestMultiplePermissionsLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         resultsMap ->
         var permissionGranted = false
@@ -574,6 +621,9 @@ class MainActivity : FragmentActivity(){
         }
     }
 
+    /**
+     * Function that launches the camera and saves it as a temporary file
+     */
     private fun invokeCamera() {
         val file = createImageFile()
         try {
@@ -585,6 +635,9 @@ class MainActivity : FragmentActivity(){
         getCameraImage.launch(uri)
     }
 
+    /**
+     * Function that creates a temporary file with a unique file name and returns it
+     */
     private fun createImageFile() : File {
         var timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         var imageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
@@ -597,6 +650,10 @@ class MainActivity : FragmentActivity(){
         }
     }
 
+    /**
+     * Activity result launcher for the camera - takes a boolean parameter which indicates whether
+     * the app was able to save the captured image
+     */
     private val getCameraImage = registerForActivityResult(ActivityResultContracts.TakePicture()) {
         success ->
         if (success) {
@@ -609,15 +666,28 @@ class MainActivity : FragmentActivity(){
         }
     }
 
+    /**
+     * Checks permission to access the camera
+     */
     fun hasCameraPermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+
+    /**
+     * Checks permission to access the storage
+     */
     fun hasExternalStoragePermission() = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
+    /**
+     * Activity result launcher for FirebaseUI - takes a parameter which is the result of the authentication
+     */
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
     ) { res ->
         this.signInResult(res)
     }
 
+    /**
+     * A function to launch FirebaseUI authentication - allows the user to sign in using their email or Google credentials
+     */
     private fun signIn() {
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().build(),
@@ -630,6 +700,9 @@ class MainActivity : FragmentActivity(){
         signInLauncher.launch(signinIntent)
     }
 
+    /**
+     * Handles the result of FirebaseUI authentication
+     */
     private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
         val response = result.idpResponse
         if (result.resultCode == RESULT_OK) {
@@ -645,6 +718,9 @@ class MainActivity : FragmentActivity(){
         }
     }
 
+    /**
+     * Composable function to preview the UI in Android Studio
+     */
     @Preview(name = "Light Mode", showBackground = true)
     @Composable
     fun DefaultPreview() {

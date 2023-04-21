@@ -27,6 +27,13 @@ internal val LightColorPalette = lightColors(
     */
 )
 
+/**
+ * Custom [MaterialTheme] that defines the color palette and other visual attributes for the app
+ *
+ * @param darkTheme Boolean that indicates whether the theme is currently in dark mode
+ * @param content Composable function to describe UI content
+ * @return A [MaterialTheme] object with  color palette, typography, shapes, and UI content
+ */
 @Composable
 fun ProjectIT3048CTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

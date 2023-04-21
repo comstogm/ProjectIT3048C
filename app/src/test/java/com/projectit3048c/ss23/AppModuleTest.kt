@@ -12,6 +12,10 @@ import org.koin.java.KoinJavaComponent.inject
 import org.koin.test.KoinTest
 import org.koin.test.inject
 
+/**
+ * Tests AppModule class using Koin - the test method verifies whether the Koin dependency injection
+ * system is set up and whether [IFoodService] can be retrieved
+ */
 class AppModuleTest : KoinTest {
 
     private val testModule = module {

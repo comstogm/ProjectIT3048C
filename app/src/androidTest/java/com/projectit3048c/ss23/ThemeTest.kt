@@ -13,7 +13,10 @@ import junit.framework.TestCase
 import org.junit.Rule
 import org.junit.Test
 
-
+/**
+ * Test class for the [ProjectIT3048CTheme] composable function
+ * Tests if the light theme is applied by default
+ */
 class ThemeTest {
     @get:Rule
     val composeTestRule = createComposeRule()

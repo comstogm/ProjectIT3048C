@@ -18,6 +18,11 @@ import com.projectit3048c.service.FoodService
 import com.projectit3048c.service.IFoodService
 import java.time.LocalDate
 
+/**
+ * ViewModel for the main screen of app. Provides access to food, food amounts, and photos data
+ * through [fetchFoods], [listenToFoodSpecimens], and [fetchPhotos] methods.
+ * Can also save, update and delete food amounts and photos
+ */
 class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel() {
     val photos: ArrayList<Photo> by mutableStateOf(ArrayList<Photo>())
     var foods: MutableLiveData<List<Food>> = MutableLiveData<List<Food>>()
@@ -181,6 +186,6 @@ class MainViewModel(var foodService : IFoodService =  FoodService()) : ViewModel
                 .addOnFailureListener {
                     Log.e(TAG, "Photo delete failed. ${it.message}")
                 }
-        }?: "You are noy Logedin"
+        }?: "You are not Logged in"
     }
 }
