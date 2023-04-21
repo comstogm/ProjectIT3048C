@@ -6,7 +6,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// Set of Material typography styles to start with
+/**
+ * Typography styles for the app
+ *
+ * @param body1 Default for body text
+ * @param button Button text style
+ * @param caption Captions text style
+ */
 val Typography = Typography(
     body1 = TextStyle(
         fontFamily = FontFamily.Default,

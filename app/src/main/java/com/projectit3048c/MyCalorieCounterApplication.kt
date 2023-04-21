@@ -7,6 +7,11 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext
 import org.koin.core.logger.Level
 
+/**
+ * Initializes Koin dependency injection framework and creates modules
+ *
+ * @constructor Creates an instance of the application class
+ */
 class MyCalorieCounterApplication : Application() {
     override fun onCreate() {
         super.onCreate()

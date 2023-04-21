@@ -26,6 +26,9 @@ import java.util.*
 import kotlin.collections.ArrayList
 import com.projectit3048c.dto.*
 
+/**
+ * Unit tests for My Calorie Counter application
+ */
 class CalorieCounterTest {
 
     @get:Rule
@@ -49,6 +52,9 @@ class CalorieCounterTest {
         mainThreadSurrogate.close()
     }
 
+    /**
+     * Test for searching for a specific food
+     */
     @Test
     fun `Given food data is available, when I search for egg, then I should receive 1 egg`() =
         runTest {
@@ -78,12 +84,18 @@ class CalorieCounterTest {
         assertTrue(containsEgg)
     }
 
+    /**
+     * Tests toString method in Food class
+     */
     @Test
     fun `Given a food with a name, when calling toString(), then return that food's name`() {
         val food: Food = Food(3, "Egg", "1 egg", "155")
         assertEquals("Egg 1 egg 155 Cal", food.toString())
     }
 
+    /**
+     * Tests setting and getting calories of a FoodAmount object
+     */
     @Test
     fun `Given calories, when setting and getting the value, the value is returned correctly`() {
         val calories = FoodAmount()
@@ -91,6 +103,9 @@ class CalorieCounterTest {
         assertEquals("100", calories.foodAmount)
     }
 
+    /**
+     * Tests the toString() method of a FoodAmount object
+     */
     @Test
     fun `Given a food amount, when toString is called, then return food name`() {
         val foodAmount = FoodAmount(foodId = "123", foodName = "Apple", internalFoodID = 1, foodIntake = "Breakfast", foodAmount = "1", foodDate = "2022-04-18")
@@ -98,6 +113,9 @@ class CalorieCounterTest {
         assertEquals("Apple", result)
     }
 
+    /**
+     * Tests the initialization of Photo
+     */
     @Test
     fun `When generating a photo object, then properties are initialized correctly`() {
         val localUri = "localUri"
@@ -115,6 +133,9 @@ class CalorieCounterTest {
         assertEquals(id, photo.id)
     }
 
+    /**
+     * Tests the initialization of User
+     */
     @Test
     fun `When generating a new User with a uid and displayName, then uid and displayName should be set`() {
         val uid = "abc123"
@@ -126,6 +147,9 @@ class CalorieCounterTest {
         assertEquals(displayName, user.displayName)
     }
 
+    /**
+     * Tests the Colors defined in Color.kt
+     */
     @Test
     fun testColors() {
         assertEquals(Color(0xFFBB86FC), Purple200)
@@ -138,12 +162,18 @@ class CalorieCounterTest {
         assertEquals(Color(0xFFFFFFFF), White)
     }
 
+
+    /**
+     * Tests the Shapes defined in Shape.kt
+     */
     @Test
     fun testShapes() {
         val expectedShape = RoundedCornerShape(4.dp)
         assertEquals(expectedShape, Shapes.small)
     }
-
+    /**
+     * Tests the colors based on the theme
+     */
     @Test
     fun `Given darkTheme is active, when the theme is called, then properties for DarkColorPalette are returned`() {
         val darkTheme = true
@@ -158,6 +188,9 @@ class CalorieCounterTest {
         assertEquals(colors.secondary, Teal200)
     }
 
+    /**
+     * Tests the body1 style
+     */
     @Test
     fun `Given a typography object, when body1 style is selected, then the value returned is correct`() {
         val expectedFontSize = 16.sp

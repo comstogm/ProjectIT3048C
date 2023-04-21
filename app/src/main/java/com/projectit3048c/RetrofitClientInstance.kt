@@ -3,6 +3,9 @@ package com.projectit3048c
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+/**
+ * Class that provides a Retrofit client instance to make network calls
+ */
 object RetrofitClientInstance {
     private var retrofit: Retrofit? = null
     private val BASE_URL = "https://my-json-server.typicode.com/"
